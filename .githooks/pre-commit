@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+echo "Encrypting vault files before commit..."
+make encrypt-vault
+
+# Re-stage les fichiers modifiés par encrypt
+git add -u
+
+echo "Re-decrypting vault files after commit..."
+make decrypt-vault
+
+exit 0
