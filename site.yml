@@ -1,0 +1,11 @@
+---
+- hosts: ovh_host
+  pre_tasks:
+    - name: Mise à jour d'APT
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      tags: always
+  roles:
+    - role: ssh_hardening
+      tags: [setup, ssh]

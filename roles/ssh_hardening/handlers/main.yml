@@ -1,0 +1,4 @@
+---
+- name: Redémarrage de sshd
+  ansible.builtin.shell: |
+    sshd -t && systemctl restart sshd
