@@ -1,0 +1,12 @@
+---
+portfolio_group:
+  hosts:
+    ovh_host:
+      ansible_host: "{{ vault_ovh_portfolio_ip }}"
+      ansible_port: "{{ vault_ovh_portfolio_port }}"
+      ansible_user: "{{ vault_ovh_portfolio_user }}"
+      ansible_ssh_private_key_file: "{{ vault_ovh_portfolio_ssh_key_path }}"
+      ansible_python_interpreter: "{{ var_python_interpreter }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: sudo
