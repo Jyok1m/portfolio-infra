@@ -1,6 +1,8 @@
 INVENTORY_FILE = inventory.yml
 VAULT_FILE = group_vars/portfolio_group/vault.yml
 VAULT_PASSWORD_FILE = .vault_pass
+TAGS ?=
+ANSIBLE_ARGS = -i $(INVENTORY_FILE) --vault-password-file $(VAULT_PASSWORD_FILE) $(if $(TAGS),--tags $(TAGS))
 
 # ------------------------------------------------------------------ #
 #                                Vault                               #
@@ -20,10 +22,10 @@ edit-vault:
 # ------------------------------------------------------------------ #
 
 dry-run:
-	ansible-playbook -i $(INVENTORY_FILE) site.yml --vault-password-file $(VAULT_PASSWORD_FILE) --check --diff
+	ansible-playbook $(ANSIBLE_ARGS) site.yml --check --diff
 
 run:
-	ansible-playbook -i $(INVENTORY_FILE) site.yml --vault-password-file $(VAULT_PASSWORD_FILE)
+	ansible-playbook $(ANSIBLE_ARGS) site.yml
 
 # ------------------------------------------------------------------ #
 #                                Tests                               #
@@ -44,13 +46,16 @@ setup-hooks:
 help:
 	@echo "Usage: make [target]"
 	@echo "Targets:"
-	@echo "	run		Run the Ansible playbook"
-	@echo "	dry-run		Run the Ansible playbook in check mode with diff"
 	@echo "	encrypt-vault	Encrypt the Ansible vault file"
 	@echo "	decrypt-vault	Decrypt the Ansible vault file"
 	@echo "	edit-vault	Edit the Ansible vault file"
 	@echo "	ping		Ping the server to check connectivity"
 	@echo "	setup-hooks	Configure Git hooks for vault encryption"
+	@echo "	run		Run the Ansible playbook"
+	@echo "	dry-run		Run the Ansible playbook in check mode with diff"
+	@echo ""
+	@echo "Run options:"
+	@echo "	TAGS=<tag>	Filter by Ansible tags (e.g. make run TAGS=fail2ban)"
 
 .DEFAULT_GOAL := help
 .PHONY: edit-vault help ping encrypt-vault decrypt-vault setup-hooks dry-run run

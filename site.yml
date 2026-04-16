@@ -8,4 +8,12 @@
       tags: always
   roles:
     - role: ssh_hardening
-      tags: [setup, ssh]
+      tags:
+        - setup
+        - security
+        - ssh_hardening
+    - role: fail2ban
+      tags:
+        - setup
+        - security
+        - fail2ban

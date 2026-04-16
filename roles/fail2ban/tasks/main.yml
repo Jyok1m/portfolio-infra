@@ -1,0 +1,21 @@
+---
+- name: Installation via APT
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+
+- name: Activation et démarrage systemd
+  ansible.builtin.systemd:
+    name: fail2ban
+    enabled: true
+    state: started
+
+- name: Application du template de configuration de la jail
+  ansible.builtin.template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes # avec backup (OKAZOU)
+  notify: Redémarrage de fail2ban

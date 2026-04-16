@@ -1,6 +1,6 @@
 # Ansible managed — do not edit manually                                             
                                                                                       
-Port {{ ssh_port }}
+Port {{ vault_ovh_portfolio_port }}
                                                                                       
 # Authentication                                          
 PermitRootLogin no
@@ -9,7 +9,7 @@ PubkeyAuthentication yes
 PermitEmptyPasswords no
 MaxAuthTries {{ ssh_max_auth_tries }}                                                
 LoginGraceTime {{ ssh_login_grace_time }}
-AllowUsers {{ ssh_allow_users }}                                                     
+AllowUsers {{ vault_ovh_portfolio_user }}                                                     
 KbdInteractiveAuthentication no                           
                                                                                       
 # Network

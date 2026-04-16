@@ -1,0 +1,4 @@
+---
+fail2ban_max_retry: 5
+fail2ban_ban_time: 3600
+fail2ban_find_time: 600

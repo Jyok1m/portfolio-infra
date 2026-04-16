@@ -1,11 +1,11 @@
 ---
-- name: Nettoyage du symlink sshd cloud-init
+- name: Nettoyage du symlink cloud-init
   ansible.builtin.file:
     path: /etc/ssh/sshd_config.d/50-cloud-init.conf
     state: absent # Supprimer le fichier de configuration généré par cloud-init
   notify: Redémarrage de sshd
 
-- name: Application de la configuration SSH personnalisée
+- name: Application du template de configuration ssh
   ansible.builtin.template:
     src: sshd_config.j2
     dest: /etc/ssh/sshd_config
