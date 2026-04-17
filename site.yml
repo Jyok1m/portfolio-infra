@@ -17,3 +17,8 @@
         - setup
         - security
         - fail2ban
+    - role: unattended_upgrades
+      tags:
+        - setup
+        - security
+        - unattended_upgrades
