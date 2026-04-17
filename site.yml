@@ -12,6 +12,11 @@
         - setup
         - security
         - ssh_hardening
+    - role: firewall
+      tags:
+        - setup
+        - security
+        - firewall
     - role: fail2ban
       tags:
         - setup
