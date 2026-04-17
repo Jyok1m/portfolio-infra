@@ -7,23 +7,8 @@
         cache_valid_time: 3600
       tags: always
   roles:
-    - role: ssh_hardening
-      tags:
-        - setup
-        - security
-        - ssh_hardening
-    - role: firewall
-      tags:
-        - setup
-        - security
-        - firewall
-    - role: fail2ban
-      tags:
-        - setup
-        - security
-        - fail2ban
-    - role: unattended_upgrades
-      tags:
-        - setup
-        - security
-        - unattended_upgrades
+    - { role: ssh_hardening, tags: [setup, security, ssh_hardening] }
+    - { role: firewall, tags: [setup, security, firewall] }
+    - { role: fail2ban, tags: [setup, security, fail2ban] }
+    - { role: unattended_upgrades, tags: [setup, security, unattended_upgrades] }
+    - { role: docker, tags: [setup, apps, docker] }

@@ -1,0 +1,35 @@
+---
+- name: Vérification de la présence de Docker
+  ansible.builtin.command: docker --version
+  register: docker_installed
+  failed_when: false
+  changed_when: false
+
+- name: Téléchargement du script d'installation
+  ansible.builtin.get_url:
+    url: "{{ docker_install_script_url }}"
+    dest: /tmp/get-docker.sh
+    mode: "0755"
+  when: docker_installed.rc != 0
+
+- name: Installation de Docker et Docker Compose
+  ansible.builtin.command: sh /tmp/get-docker.sh
+  when: docker_installed.rc != 0
+
+- name: Ajout de l'utilisateur actuel au groupe Docker
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: true
+
+- name: Vérification du statut du service Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Suppression du script d'installation
+  ansible.builtin.file:
+    path: /tmp/get-docker.sh
+    state: absent
+  when: docker_installed.rc != 0
