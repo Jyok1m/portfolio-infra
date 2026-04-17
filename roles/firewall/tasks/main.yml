@@ -1,0 +1,27 @@
+---
+- name: Installation via APT
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+- name: Autorisation des ports SSH, HTTP et HTTPS
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+    comment: "{{ item.comment }}"
+  loop: "{{ ufw_allowed_ports }}"
+
+- name: Fermeture de tous les autres ports Ingress
+  community.general.ufw:
+    default: deny
+    direction: incoming
+
+- name: Ouverture de tous les ports Egress
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+
+- name: Activation de UFW
+  community.general.ufw:
+    state: enabled
