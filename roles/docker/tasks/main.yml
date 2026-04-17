@@ -33,3 +33,9 @@
     path: /tmp/get-docker.sh
     state: absent
   when: docker_installed.rc != 0
+
+- name: Connexion à Docker Hub
+  community.docker.docker_login:
+    registry_url: "{{ docker_registry_url }}"
+    username: "{{ vault_dockerhub_username }}"
+    password: "{{ vault_dockerhub_pat }}"
