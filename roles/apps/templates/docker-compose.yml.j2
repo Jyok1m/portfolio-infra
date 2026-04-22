@@ -9,7 +9,7 @@ services:
       - "--api.insecure=false"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=apps_portfolio"
+      - "--providers.docker.network=portfolio"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
@@ -48,7 +48,20 @@ services:
     networks:
       - ipseis
 {% endfor %}
-#/* ------------------------ Ipseis API ----------------------- */
+#/* --------------------------- Portfolio -------------------------- */
+  portfolio-frontend:
+    image: {{ vault_portfolio_image }}
+    container_name: portfolio-frontend
+    restart: on-failure
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portfolio_frontend.rule=Host(`{{ vault_base_domain }}`) || Host(`{{ vault_base_domain_fr }}`)
+      - traefik.http.routers.portfolio_frontend.entrypoints=websecure
+      - traefik.http.routers.portfolio_frontend.tls.certresolver=letsencrypt
+      - traefik.http.services.portfolio_frontend.loadbalancer.server.port=3000
+    networks:
+      - portfolio
+#/* --------------------------- Ipseis API ------------------------- */
 {% for env in vault_ipseis_environments %}
   {{ env.name }}:
     image: {{ env.image | to_json }}
@@ -76,9 +89,9 @@ services:
     volumes:
       - {{ env.name }}-data:/app/public/uploads
     networks:
-      - portfolio
       - ipseis
 {% endfor %}
+
 volumes:
 # Cluster MongoDB
 {% for env in vault_mongodb_environments %}
@@ -88,6 +101,7 @@ volumes:
 {% for env in vault_ipseis_environments %}
   {{ env.name }}-data:
 {% endfor %}
+
 networks:
   portfolio:
   ipseis:
