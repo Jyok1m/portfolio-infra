@@ -18,3 +18,4 @@
     state: present
     pull: missing
     wait: true
+    remove_orphans: true
