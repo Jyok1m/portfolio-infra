@@ -1,2 +1,3 @@
 ---
 var_python_interpreter: /usr/bin/python3
+var_deploy_base_path: /opt

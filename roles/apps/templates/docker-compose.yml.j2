@@ -1,0 +1,25 @@
+services:
+{% for env in vault_mongodb_environments %}
+  {{ env.name }}:
+    image: {{ vault_mongodb_image }}
+    container_name: {{ env.name }}
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: {{ vault_mongodb_root_user | to_json }}
+      MONGO_INITDB_ROOT_PASSWORD: {{ env.root_password | to_json}}
+    command: --wiredTigerCacheSizeGB 1
+    ports:
+      - "127.0.0.1:{{ env.port }}:27017"
+    volumes:
+      - {{ env.name }}-data:/data/db
+    networks:
+      - portfolio
+{% endfor %}
+
+volumes:
+{% for env in vault_mongodb_environments %}
+  {{ env.name }}-data:
+{% endfor %}
+
+networks:
+  portfolio:

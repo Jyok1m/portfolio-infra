@@ -1,0 +1,2 @@
+---
+deploy_path: "{{ var_deploy_base_path }}/apps"
