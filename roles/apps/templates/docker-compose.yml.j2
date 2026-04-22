@@ -72,7 +72,7 @@ services:
         condition: service_healthy
     environment:
       USER_AGENT_ENV: {{ env.profile | to_json }}
-      MONGODB_URI: "mongodb://{{ vault_ipseis_backend_username }}:{{ env.mongodb_password }}@{{ env.mongodb_host }}:{{ env.mongodb_port }}/{{ env.mongodb_database }}?authSource=admin"
+      MONGODB_URI: "mongodb://{{ vault_ipseis_backend_username }}:{{ env.mongodb_password }}@{{ env.mongodb_host }}:27017/{{ env.mongodb_database }}?authSource=admin"
       FRONTEND_URL: {{ env.frontend_url | to_json }}
       JWT_SECRET: {{ vault_ipseis_jwt_secret | to_json }}
       NODEMAILER_EMAIL: {{ vault_nodemailer_email | to_json }}
