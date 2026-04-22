@@ -1,27 +1,93 @@
 services:
+#/* ---------------------------- Traefik --------------------------- */
+  traefik:
+    image: {{ vault_traefik_image | to_json }}
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=apps_portfolio"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--certificatesresolvers.letsencrypt.acme.email={{ vault_acme_email }}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entryPoint=metrics"
+      - "--entrypoints.metrics.address=:8082"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./acme.json:/acme.json
+    networks:
+      - portfolio
+      - ipseis
+#/* ------------------------ Cluster MongoDB ----------------------- */
 {% for env in vault_mongodb_environments %}
   {{ env.name }}:
-    image: {{ vault_mongodb_image }}
+    image: {{ vault_mongodb_image | to_json }}
     container_name: {{ env.name }}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand('ping').ok"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: {{ vault_mongodb_root_user | to_json }}
-      MONGO_INITDB_ROOT_PASSWORD: {{ env.root_password | to_json}}
+      MONGO_INITDB_ROOT_PASSWORD: {{ env.root_password | to_json }}
     command: --wiredTigerCacheSizeGB 1
     ports:
       - "127.0.0.1:{{ env.port }}:27017"
     volumes:
       - {{ env.name }}-data:/data/db
     networks:
-      - portfolio
+      - ipseis
 {% endfor %}
-
+#/* ------------------------ Ipseis API ----------------------- */
+{% for env in vault_ipseis_environments %}
+  {{ env.name }}:
+    image: {{ env.image | to_json }}
+    container_name: {{ env.name }}
+    restart: on-failure
+    depends_on:
+      {{ env.mongodb_host }}:
+        condition: service_healthy
+    environment:
+      USER_AGENT_ENV: {{ env.profile | to_json }}
+      MONGODB_URI: "mongodb://{{ vault_ipseis_backend_username }}:{{ env.mongodb_password }}@{{ env.mongodb_host }}:{{ env.mongodb_port }}/{{ env.mongodb_database }}?authSource=admin"
+      FRONTEND_URL: {{ env.frontend_url | to_json }}
+      JWT_SECRET: {{ vault_ipseis_jwt_secret | to_json }}
+      NODEMAILER_EMAIL: {{ vault_nodemailer_email | to_json }}
+      NODEMAILER_EMAIL_TO: {{ env.nodemailer_email_to | to_json }}
+      NODEMAILER_PASSWORD: {{ vault_nodemailer_password | to_json }}
+      BACKEND_USERNAME: {{ vault_ipseis_backend_username | to_json }}
+      BACKEND_PASSWORD: {{ vault_ipseis_backend_password | to_json }}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.ipseis_api_{{ env.profile }}.entrypoints: websecure
+      traefik.http.routers.ipseis_api_{{ env.profile }}.tls.certresolver: letsencrypt
+      traefik.http.services.ipseis_api_{{ env.profile }}.loadbalancer.server.port: "3000"
+      traefik.http.routers.ipseis_api_{{ env.profile }}.rule: Host(`{{ env.subdomain }}.{{ vault_base_domain_fr }}`)
+    volumes:
+      - {{ env.name }}-data:/app/public/uploads
+    networks:
+      - portfolio
+      - ipseis
+{% endfor %}
 volumes:
+# Cluster MongoDB
 {% for env in vault_mongodb_environments %}
   {{ env.name }}-data:
 {% endfor %}
-
+# Ipseis API
+{% for env in vault_ipseis_environments %}
+  {{ env.name }}-data:
+{% endfor %}
 networks:
   portfolio:
+  ipseis:
