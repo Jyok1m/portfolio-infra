@@ -17,5 +17,6 @@
     project_src: "{{ deploy_path }}"
     state: present
     pull: missing
-    wait: true
     remove_orphans: true
+    wait: true
+    wait_timeout: 120

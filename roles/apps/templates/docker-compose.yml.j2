@@ -4,6 +4,8 @@ services:
     image: {{ vault_mongodb_image }}
     container_name: {{ env.name }}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand('ping').ok"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: {{ vault_mongodb_root_user | to_json }}
       MONGO_INITDB_ROOT_PASSWORD: {{ env.root_password | to_json}}
