@@ -28,3 +28,104 @@
     remove_orphans: true
     wait: true
     wait_timeout: 120
+
+# -------------------------- Jenkins setup ------------------------- #
+
+- name: Copie du template du Dockerfile de Jenkins
+  ansible.builtin.template:
+    src: jenkins.dockerfile.j2
+    dest: "{{ var_apps_deploy_path }}/Dockerfile.jenkins"
+    mode: "0644"
+
+- name: Build image Jenkins
+  ansible.builtin.command:
+    cmd: "docker build -f Dockerfile.jenkins -t {{ vault_jenkins_image }} ."
+    chdir: "{{ var_apps_deploy_path }}"
+
+- name: Push l'image sur le repo Docker
+  ansible.builtin.command:
+    cmd: "docker push {{ vault_jenkins_image }}"
+
+- name: Lancement de Jenkins
+  community.docker.docker_compose_v2:
+    project_src: "{{ var_apps_deploy_path }}"
+    state: present
+    pull: always
+    profiles:
+      - jenkins
+    remove_orphans: true
+    wait: true
+    wait_timeout: 120
+
+- name: Check si known_hosts présent sur conteneur Jenkins
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui test -f /var/jenkins_home/.ssh/known_hosts
+  register: known_hosts_check
+  failed_when: false
+  changed_when: false
+
+- name: Mise en place SSH sur conteneur
+  ansible.builtin.command:
+    cmd: >
+      docker exec jenkins-gui bash -c
+      "mkdir -p /var/jenkins_home/.ssh &&
+      ssh-keyscan -t ed25519 github.com >> /var/jenkins_home/.ssh/known_hosts &&
+      chown -R jenkins:jenkins /var/jenkins_home/.ssh"
+  when: known_hosts_check.rc != 0
+
+- name: Création de l'utilisateur Jenkins
+  ansible.builtin.user:
+    name: jenkins
+    shell: /bin/bash
+    create_home: true
+    groups: docker
+    append: true
+
+- name: Vérification de la clé de déploiement sur le conteneur
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui test -f /var/jenkins_home/.ssh/deploy_key
+  register: deploy_key_check
+  failed_when: false
+  changed_when: false
+
+- name: Génération de la clé de déploiement
+  ansible.builtin.command:
+    cmd: >
+      docker exec jenkins-gui bash -c
+      "mkdir -p /var/jenkins_home/.ssh &&
+      ssh-keygen -t ed25519 -C 'jenkins-deploy' -f /var/jenkins_home/.ssh/deploy_key -N '' &&
+      chown -R jenkins:jenkins /var/jenkins_home/.ssh"
+  when: deploy_key_check.rc != 0
+
+- name: Récupération de la clé de déploiement
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui cat /var/jenkins_home/.ssh/deploy_key.pub
+  register: deploy_pub_key
+  changed_when: false
+
+- name: Autorisation de la clé pour l'uutilsiateur Jenkins
+  ansible.posix.authorized_key:
+    user: jenkins
+    key: "{{ deploy_pub_key.stdout }}"
+    state: present
+
+- name: Récupération du gateway Docker
+  ansible.builtin.command:
+    cmd: docker network inspect jenkins --format '{% raw %}{{range .IPAM.Config}}{{.Gateway}}{{end}}{% endraw %}'
+  register: docker_gateway
+  changed_when: false
+
+- name: Vérification de la présence du gateway dans les known hosts
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui grep -q "{{ docker_gateway.stdout }}" /var/jenkins_home/.ssh/known_hosts
+  register: host_known_check
+  failed_when: false
+  changed_when: false
+
+- name: Ajout du gateway dans les known hosts du container
+  ansible.builtin.command:
+    cmd: >
+      docker exec jenkins-gui bash -c
+      "ssh-keyscan -t ed25519 -p {{ vault_ovh_portfolio_port }} {{ docker_gateway.stdout }} >> /var/jenkins_home/.ssh/known_hosts &&
+      chown jenkins:jenkins /var/jenkins_home/.ssh/known_hosts"
+  when: host_known_check.rc != 0

@@ -10,3 +10,4 @@ portfolio_group:
   vars:
     ansible_become: true
     ansible_become_method: sudo
+    ansible_deprecation_warnings: false
