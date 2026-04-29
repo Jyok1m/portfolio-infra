@@ -1,4 +1,9 @@
 ---
-var_python_interpreter: /usr/bin/python3
+app_base_path: /opt
+data_base_path: /var/lib
+log_base_path: /var/logs
+python_interpreter_path: /usr/bin/python3
+
+# deprecated below
 var_deploy_base_path: /opt
 var_apps_deploy_path: "/opt/apps"

@@ -6,7 +6,7 @@ portfolio_group:
       ansible_port: "{{ vault_ovh_portfolio_port }}"
       ansible_user: "{{ vault_ovh_portfolio_user }}"
       ansible_ssh_private_key_file: "{{ vault_ovh_portfolio_ssh_key_path }}"
-      ansible_python_interpreter: "{{ var_python_interpreter }}"
+      ansible_python_interpreter: "{{ python_interpreter_path }}"
   vars:
     ansible_become: true
     ansible_become_method: sudo
