@@ -1,6 +1,6 @@
 services:
   portfolio:
-    image: jyok1m/portfolio:latest
+    image: {{ portfolio_image }}
     container_name: portfolio
     restart: unless-stopped
     labels:
