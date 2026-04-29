@@ -1,6 +1,6 @@
 ---
 ufw_allowed_ports:
-  - port: "{{ vault_ovh_portfolio_port }}"
+  - port: "{{ ovh_portfolio_port }}"
     proto: "tcp"
     comment: "SSH"
   - port: "80"

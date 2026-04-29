@@ -1,0 +1,4 @@
+---
+traefik_image_name: traefik
+traefik_image_tag: v3.6
+traefik_image: "{{ traefik_image_name }}:{{ traefik_image_tag }}"

@@ -11,6 +11,5 @@
     - { role: firewall, tags: [setup, security, firewall] }
     - { role: fail2ban, tags: [setup, security, fail2ban] }
     - { role: unattended_upgrades, tags: [setup, security, unattended_upgrades] }
-    - { role: docker, tags: [setup, apps, docker] }
-    - { role: common, tags: [setup, apps] }
-    - { role: apps, tags: [setup, apps] }
+    - { role: docker, tags: [setup, common, docker] }
+    - { role: traefik, tags: [common, traefik] }
