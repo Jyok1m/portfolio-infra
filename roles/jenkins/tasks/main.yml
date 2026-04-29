@@ -1,0 +1,113 @@
+---
+- name: Création du répertoire de déploiement
+  ansible.builtin.file:
+    path: "{{ app_base_path }}/jenkins"
+    state: directory
+    mode: "0755"
+
+- name: Génération du Dockerfile Jenkins depuis le template
+  ansible.builtin.template:
+    src: Dockerfile.j2
+    dest: "{{ app_base_path }}/jenkins/Dockerfile"
+    mode: "0644"
+
+- name: Construction et publication de l'image Jenkins
+  community.docker.docker_image:
+    name: "{{ jenkins_image_name }}"
+    tag: "{{ jenkins_image_tag }}"
+    build:
+      path: "{{ app_base_path }}/jenkins"
+      dockerfile: Dockerfile
+      pull: true
+    source: build
+    push: true
+    force_source: false
+
+- name: Application du template docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_base_path }}/jenkins/docker-compose.yml"
+    mode: "0644"
+  no_log: true
+
+- name: Démarrage des services via Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_base_path }}/jenkins"
+    state: present
+    pull: always
+    remove_orphans: true
+    wait: true
+    wait_timeout: 120
+
+- name: Vérification de la présence du known_hosts dans le conteneur Jenkins
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui test -f /var/jenkins_home/.ssh/known_hosts
+  register: known_hosts_check
+  failed_when: false
+  changed_when: false
+
+- name: Initialisation du known_hosts avec la clé GitHub dans le conteneur Jenkins
+  ansible.builtin.command:
+    cmd: >
+      docker exec jenkins-gui bash -c
+      "mkdir -p /var/jenkins_home/.ssh &&
+      ssh-keyscan -t ed25519 github.com >> /var/jenkins_home/.ssh/known_hosts &&
+      chown -R jenkins:jenkins /var/jenkins_home/.ssh"
+  when: known_hosts_check.rc != 0
+
+- name: Création de l'utilisateur système jenkins sur l'hôte
+  ansible.builtin.user:
+    name: jenkins
+    shell: /bin/bash
+    create_home: true
+    groups: docker
+    append: true
+
+- name: Vérification de la présence de la clé de déploiement dans le conteneur Jenkins
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui test -f /var/jenkins_home/.ssh/deploy_key
+  register: deploy_key_check
+  failed_when: false
+  changed_when: false
+
+- name: Génération de la paire de clés SSH de déploiement dans le conteneur Jenkins
+  ansible.builtin.command:
+    cmd: >
+      docker exec jenkins-gui bash -c
+      "mkdir -p /var/jenkins_home/.ssh &&
+      ssh-keygen -t ed25519 -C 'jenkins-deploy' -f /var/jenkins_home/.ssh/deploy_key -N '' &&
+      chown -R jenkins:jenkins /var/jenkins_home/.ssh"
+  when: deploy_key_check.rc != 0
+
+- name: Lecture de la clé publique de déploiement depuis le conteneur Jenkins
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui cat /var/jenkins_home/.ssh/deploy_key.pub
+  register: deploy_pub_key
+  changed_when: false
+
+- name: Autorisation de la clé de déploiement pour l'utilisateur jenkins sur l'hôte
+  ansible.posix.authorized_key:
+    user: jenkins
+    key: "{{ deploy_pub_key.stdout }}"
+    state: present
+
+- name: Récupération de l'IP du gateway du réseau Docker jenkins
+  ansible.builtin.command:
+    cmd: docker network inspect jenkins --format '{% raw %}{{range .IPAM.Config}}{{.Gateway}}{{end}}{% endraw %}'
+  register: docker_gateway
+  changed_when: false
+
+- name: Vérification de la présence du gateway dans le known_hosts du conteneur Jenkins
+  ansible.builtin.command:
+    cmd: docker exec jenkins-gui grep -q "{{ docker_gateway.stdout }}" /var/jenkins_home/.ssh/known_hosts
+  register: host_known_check
+  failed_when: false
+  changed_when: false
+
+- name: Ajout du gateway dans le known_hosts du conteneur Jenkins
+  ansible.builtin.command:
+    cmd: >
+      docker exec jenkins-gui bash -c
+      "ssh-keyscan -t ed25519 -p {{ ovh_portfolio_port }} {{ docker_gateway.stdout }} >> /var/jenkins_home/.ssh/known_hosts &&
+      chown jenkins:jenkins /var/jenkins_home/.ssh/known_hosts"
+  when: host_known_check.rc != 0

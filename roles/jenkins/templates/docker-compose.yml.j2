@@ -1,0 +1,65 @@
+services:
+  jenkins-dind:
+    image: docker:dind
+    container_name: jenkins-dind
+    command: --storage-driver overlay2
+    privileged: true
+    restart: unless-stopped
+    healthcheck:                                                                                                                           
+      test: ["CMD", "docker", "info"]                                                                                                    
+      interval: 10s                                                                                                                        
+      timeout: 5s                                                                                                                          
+      retries: 5                                                                                                                         
+      start_period: 30s
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - jenkins:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client
+    networks:
+      jenkins-internal:
+        aliases:
+          - docker
+
+  jenkins-gui:
+    image: {{ jenkins_image }}
+    container_name: jenkins-gui
+    restart: unless-stopped
+    depends_on:                                                                                                                            
+      jenkins-dind:
+        condition: service_healthy
+    environment:
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_TLS_VERIFY: 1
+      JENKINS_OPTS: --httpPort=8080
+      JENKINS_URL: https://jenkins.joachimjasmin.com/
+      JAVA_OPTS: -Djenkins.model.Jenkins.crumbIssuerProxyCompatibility=true -Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.joachimjasmin.com`)
+      - traefik.http.routers.jenkins.entrypoints=websecure
+      - traefik.http.routers.jenkins.tls.certresolver=letsencrypt
+      - traefik.http.services.jenkins.loadbalancer.server.port=8080
+      - traefik.http.routers.jenkins.middlewares=jenkins-headers
+      - traefik.http.middlewares.jenkins-headers.headers.customrequestheaders.X-Forwarded-Proto=https
+      - traefik.http.middlewares.jenkins-headers.headers.customrequestheaders.X-Forwarded-Port=443
+    volumes:
+      - jenkins:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+    networks:
+      - jenkins-internal
+      - traefik-public
+
+volumes:
+  jenkins:
+    name: jenkins
+  jenkins-docker-certs:
+    name: jenkins-docker-certs
+
+networks:
+  jenkins-internal:                                                                                                                    
+    name: jenkins-internal                                                                                                           
+  traefik-public:
+    name: traefik-public
+    external: true

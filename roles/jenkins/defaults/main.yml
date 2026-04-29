@@ -1,0 +1,4 @@
+---
+jenkins_image_name: jyok1m/jenkins
+jenkins_image_tag: v1.0
+jenkins_image: "{{ jenkins_image_name }}:{{ jenkins_image_tag }}"
