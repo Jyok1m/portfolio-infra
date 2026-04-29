@@ -3,6 +3,12 @@ services:
     image: {{ portfolio_image }}
     container_name: portfolio
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512G
+        reservations:
+          memory: 128M
     labels:
       - traefik.enable=true
       - traefik.http.routers.portfolio.rule=Host(`joachimjasmin.com`) || Host(`joachimjasmin.fr`)
