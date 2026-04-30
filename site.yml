@@ -25,4 +25,4 @@
     - { role: ipseis, tags: [apps, ipseis] }
 
     # Capsule apps
-    - { role: ipseis, tags: [apps, ipseis] }
+    - { role: mongo_test, tags: [test, mongo_test] }
