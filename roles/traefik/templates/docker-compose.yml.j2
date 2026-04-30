@@ -4,6 +4,14 @@ services:
     image: {{ traefik_image }}
     container_name: traefik
     restart: unless-stopped
+    deploy:                                                                                                                                
+      resources:                                                                                                                         
+        limits:
+          memory: 512M                                                                                                                       
+          cpus: 1.0
+        reservations:                                                                                                                      
+          memory: 128M                                                                                                                   
+          cpus: 0.1
     command:
       - "--api.dashboard=true"
       - "--api.insecure=false"
@@ -20,12 +28,12 @@ services:
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.entryPoint=metrics"
       - "--entrypoints.metrics.address=:8082"
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - "{{ data_base_path }}/traefik/acme.json:/acme.json"
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
     networks:
       - traefik-public
 

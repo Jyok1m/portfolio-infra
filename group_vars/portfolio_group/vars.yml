@@ -6,4 +6,4 @@ python_interpreter_path: /usr/bin/python3
 
 # deprecated below
 var_deploy_base_path: /opt
-var_apps_deploy_path: "/opt/apps"
+var_apps_app_base_path: "/opt/apps"

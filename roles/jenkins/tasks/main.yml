@@ -93,7 +93,7 @@
 
 - name: Récupération de l'IP du gateway du réseau Docker jenkins
   ansible.builtin.command:
-    cmd: docker network inspect jenkins --format '{% raw %}{{range .IPAM.Config}}{{.Gateway}}{{end}}{% endraw %}'
+    cmd: docker network inspect jenkins-internal --format '{% raw %}{{range .IPAM.Config}}{{.Gateway}}{{end}}{% endraw %}'
   register: docker_gateway
   changed_when: false
 

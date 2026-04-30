@@ -2,15 +2,23 @@ services:
   jenkins-dind:
     image: docker:dind
     container_name: jenkins-dind
-    command: --storage-driver overlay2
-    privileged: true
     restart: unless-stopped
+    privileged: true
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: 4.0
+        reservations:
+          memory: 512M
+          cpus: 0.25
     healthcheck:                                                                                                                           
       test: ["CMD", "docker", "info"]                                                                                                    
       interval: 10s                                                                                                                        
       timeout: 5s                                                                                                                          
       retries: 5                                                                                                                         
       start_period: 30s
+    command: --storage-driver overlay2
     environment:
       - DOCKER_TLS_CERTDIR=/certs
     volumes:
@@ -28,6 +36,14 @@ services:
     depends_on:                                                                                                                            
       jenkins-dind:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: 2.0
+        reservations:
+          memory: 512M
+          cpus: 0.25
     environment:
       DOCKER_HOST: tcp://docker:2376
       DOCKER_CERT_PATH: /certs/client
@@ -35,6 +51,12 @@ services:
       JENKINS_OPTS: --httpPort=8080
       JENKINS_URL: https://jenkins.joachimjasmin.com/
       JAVA_OPTS: -Djenkins.model.Jenkins.crumbIssuerProxyCompatibility=true -Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true
+    volumes:
+      - jenkins:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+    networks:
+      - jenkins-internal
+      - traefik-public
     labels:
       - traefik.enable=true
       - traefik.http.routers.jenkins.rule=Host(`jenkins.joachimjasmin.com`)
@@ -44,12 +66,6 @@ services:
       - traefik.http.routers.jenkins.middlewares=jenkins-headers
       - traefik.http.middlewares.jenkins-headers.headers.customrequestheaders.X-Forwarded-Proto=https
       - traefik.http.middlewares.jenkins-headers.headers.customrequestheaders.X-Forwarded-Port=443
-    volumes:
-      - jenkins:/var/jenkins_home
-      - jenkins-docker-certs:/certs/client:ro
-    networks:
-      - jenkins-internal
-      - traefik-public
 
 volumes:
   jenkins:

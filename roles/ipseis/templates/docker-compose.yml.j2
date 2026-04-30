@@ -1,0 +1,91 @@
+---
+services:
+  ipseis-db:
+    image: {{ ipseis_db_image }}
+    container_name: ipseis-db
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: 1.5
+        reservations:
+          memory: 512M
+          cpus: 0.25
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --username
+        - "{{ ipseis_db_root_user }}"
+        - --password
+        - "{{ ipseis_db_root_password }}"
+        - --authenticationDatabase
+        - admin
+        - --eval
+        - "db.runCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: --wiredTigerCacheSizeGB 1
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME={{ ipseis_db_root_user }}
+      - MONGO_INITDB_ROOT_PASSWORD={{ ipseis_db_root_password }}
+    volumes:
+      - ipseis-db:/data/db
+    ports:
+      - "127.0.0.1:{{ ipseis_db_external_port }}:27017/tcp"
+    networks:
+      - ipseis-internal
+
+  ipseis-api:
+    image: {{ ipseis_image }}
+    container_name: ipseis-api
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: 1.0
+        reservations:
+          memory: 256M
+          cpus: 0.2
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=768
+      - NODE_ENV=production
+      - USER_AGENT_ENV=prod
+      - MONGODB_URI={{ ipseis_db_uri }}
+      - FRONTEND_URL=https://ipseis.fr
+      - JWT_SECRET={{ ipseis_jwt_secret }}
+      - NODEMAILER_EMAIL="ipseis.ne.pas.repondre@gmail.com"
+      - NODEMAILER_PASSWORD={{ ipseis_nodemailer_password }}
+      - NODEMAILER_EMAIL_TO="helenedm@ipseis.fr"
+      - BACKEND_USERNAME={{ ipseis_db_root_user }}
+      - BACKEND_PASSWORD={{ ipseis_db_root_password }}
+    volumes:
+      - "{{ app_base_path }}/ipseis/uploads:/app/public/uploads"
+    networks:
+      - ipseis-internal
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.joachimjasmin.fr`)
+      - traefik.http.routers.ipseis-api.entrypoints=websecure
+      - traefik.http.routers.ipseis-api.tls.certresolver=letsencrypt
+      - traefik.http.services.ipseis-api.loadbalancer.server.port=3000
+
+volumes:
+  ipseis-db:
+    name: ipseis-db
+  ipseis-api:
+    name: ipseis-api
+
+networks:
+  ipseis-internal:
+    name: ipseis-internal
+    driver: bridge
+  traefik-public:
+    name: traefik-public
+    external: true

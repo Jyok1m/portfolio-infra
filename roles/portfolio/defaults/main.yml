@@ -1,4 +1,4 @@
 ---
 portfolio_image_name: jyok1m/portfolio
 portfolio_image_tag: latest
-portfolio_image: "{{ jyok1m/portfolio }}:{{ portfolio_image_tag }}"
+portfolio_image: "{{ portfolio_image_name }}:{{ portfolio_image_tag }}"

@@ -12,4 +12,7 @@
     - { role: fail2ban, tags: [setup, security, fail2ban] }
     - { role: unattended_upgrades, tags: [setup, security, unattended_upgrades] }
     - { role: docker, tags: [setup, common, docker] }
-    - { role: traefik, tags: [common, traefik] }
+    - { role: traefik, tags: [apps, common, traefik] }
+    - { role: jenkins, tags: [apps, common, jenkins] }
+    - { role: portfolio, tags: [apps, portfolio] }
+    - { role: ipseis, tags: [apps, ipseis] }
