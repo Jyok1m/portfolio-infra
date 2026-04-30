@@ -1,0 +1,4 @@
+---
+mongo_test_db_image_name: mongo
+mongo_test_db_image_tag: 8.2.5
+mongo_test_db_image: "{{ ipseis_db_image_name }}:{{ ipseis_db_image_tag }}"

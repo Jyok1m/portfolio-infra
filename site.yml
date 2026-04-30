@@ -7,12 +7,22 @@
         cache_valid_time: 3600
       tags: always
   roles:
+    # Initial setup
     - { role: ssh_hardening, tags: [setup, security, ssh_hardening] }
     - { role: firewall, tags: [setup, security, firewall] }
     - { role: fail2ban, tags: [setup, security, fail2ban] }
     - { role: unattended_upgrades, tags: [setup, security, unattended_upgrades] }
+
+    # Engines setup
     - { role: docker, tags: [setup, common, docker] }
+
+    # Common apps via Docker
     - { role: traefik, tags: [apps, common, traefik] }
     - { role: jenkins, tags: [apps, common, jenkins] }
+
+    # Client apps
     - { role: portfolio, tags: [apps, portfolio] }
+    - { role: ipseis, tags: [apps, ipseis] }
+
+    # Capsule apps
     - { role: ipseis, tags: [apps, ipseis] }
