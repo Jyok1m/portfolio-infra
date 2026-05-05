@@ -10,12 +10,18 @@ services:
           memory: 2G
         reservations:
           memory: 512M
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
       - --web.console.libraries=/etc/prometheus/console_libraries
       - --web.console.templates=/etc/prometheus/consoles
-      - --storage.tsdb.retention.time=200h
+      - --storage.tsdb.retention.time=720h
       - --web.enable-lifecycle
       - --web.external-url=https://prometheus.joachimjasmin.com
     volumes:
@@ -36,7 +42,8 @@ services:
     container_name: grafana
     restart: unless-stopped
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -48,7 +55,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=https://grafana.joachimjasmin.com
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
-      - GF_METRICS_ENABLED="true"
+      - GF_METRICS_ENABLED=true
     volumes:
       - grafana:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
