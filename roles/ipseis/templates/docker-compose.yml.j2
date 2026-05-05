@@ -70,7 +70,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.joachimjasmin.fr`)
+      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.joachimjasmin.com`) || Host(`ipseis-backend.joachimjasmin.fr`)
       - traefik.http.routers.ipseis-api.entrypoints=websecure
       - traefik.http.routers.ipseis-api.tls.certresolver=letsencrypt
       - traefik.http.services.ipseis-api.loadbalancer.server.port=3000

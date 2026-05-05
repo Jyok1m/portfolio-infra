@@ -58,7 +58,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jenkins.rule=Host(`jenkins.joachimjasmin.com`)
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.joachimjasmin.com`) || Host(`jenkins.joachimjasmin.fr`) 
       - traefik.http.routers.jenkins.entrypoints=websecure
       - traefik.http.routers.jenkins.tls.certresolver=letsencrypt
       - traefik.http.services.jenkins.loadbalancer.server.port=8080

@@ -32,7 +32,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.prom.rule=Host(`prometheus.joachimjasmin.com`)
+      - traefik.http.routers.prom.rule=Host(`prometheus.joachimjasmin.com`) || Host(`prometheus.joachimjasmin.fr`) 
       - traefik.http.routers.prom.entrypoints=websecure
       - traefik.http.routers.prom.tls.certresolver=letsencrypt
       - traefik.http.services.prom.loadbalancer.server.port=9090
@@ -64,7 +64,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.grafana.rule=Host(`grafana.joachimjasmin.com`)
+      - traefik.http.routers.grafana.rule=Host(`grafana.joachimjasmin.com`) || Host(`grafana.joachimjasmin.fr`) 
       - traefik.http.routers.grafana.entrypoints=websecure
       - traefik.http.routers.grafana.tls.certresolver=letsencrypt
       - traefik.http.services.grafana.loadbalancer.server.port=3000
