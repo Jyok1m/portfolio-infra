@@ -19,10 +19,11 @@
     # Common apps via Docker
     - { role: traefik, tags: [apps, common, traefik] }
     - { role: jenkins, tags: [apps, common, jenkins] }
+    - { role: monitoring, tags: [apps, common, monitoring] }
 
     # Client apps
     - { role: portfolio, tags: [apps, portfolio] }
     - { role: ipseis, tags: [apps, ipseis] }
 
-    # Capsule apps
+    # DB Test
     - { role: mongo_test, tags: [test, mongo_test] }

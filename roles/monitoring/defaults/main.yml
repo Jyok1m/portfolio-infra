@@ -1,0 +1,16 @@
+---
+prometheus_image_name: prom/prometheus
+prometheus_image_tag: v3.7.3
+prometheus_image: "{{ prometheus_image_name }}:{{ prometheus_image_tag }}"
+
+grafana_image_name: grafana/grafana
+grafana_image_tag: 12.4.0-19303720460
+grafana_image: "{{ grafana_image_name }}:{{ grafana_image_tag }}"
+
+node_exporter_image_name: prom/node-exporter
+node_exporter_image_tag: v1.10.2
+node_exporter_image: "{{ node_exporter_image_name }}:{{ node_exporter_image_tag }}"
+
+cadvisor_image_name: ghcr.io/google/cadvisor
+cadvisor_image_tag: 0.55.1
+cadvisor_image: "{{ cadvisor_image_name }}:{{ cadvisor_image_tag }}"

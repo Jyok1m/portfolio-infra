@@ -11,7 +11,6 @@ services:
           cpus: 1.5
         reservations:
           memory: 512M
-          cpus: 0.25
     healthcheck:
       test:
         - CMD
@@ -51,7 +50,6 @@ services:
           cpus: 1.0
         reservations:
           memory: 256M
-          cpus: 0.2
     environment:
       - NODE_OPTIONS=--max-old-space-size=768
       - NODE_ENV=production

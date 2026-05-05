@@ -11,7 +11,6 @@ services:
           cpus: 1.0
         reservations:                                                                                                                      
           memory: 128M                                                                                                                   
-          cpus: 0.1
     command:
       - "--api.dashboard=true"
       - "--api.insecure=false"
@@ -28,6 +27,11 @@ services:
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.entryPoint=metrics"
       - "--entrypoints.metrics.address=:8082"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - "{{ data_base_path }}/traefik/acme.json:/acme.json"
