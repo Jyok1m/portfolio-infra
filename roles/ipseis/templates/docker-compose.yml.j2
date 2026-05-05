@@ -34,6 +34,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD={{ ipseis_db_root_password }}
     volumes:
       - ipseis-db:/data/db
+      - ipseis-db-configdb:/data/configdb
     ports:
       - "127.0.0.1:{{ ipseis_db_external_port }}:27017/tcp"
     networks:
@@ -77,8 +78,8 @@ services:
 volumes:
   ipseis-db:
     name: ipseis-db
-  ipseis-api:
-    name: ipseis-api
+  ipseis-db-configdb:
+    name: ipseis-db-configdb
 
 networks:
   ipseis-internal:

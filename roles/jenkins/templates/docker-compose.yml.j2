@@ -23,6 +23,7 @@ services:
     volumes:
       - jenkins:/var/jenkins_home
       - jenkins-docker-certs:/certs/client
+      - jenkins-dind-data:/var/lib/docker
     networks:
       jenkins-internal:
         aliases:
@@ -70,6 +71,8 @@ volumes:
     name: jenkins
   jenkins-docker-certs:
     name: jenkins-docker-certs
+  jenkins-dind-data:
+    name: jenkins-dind-data
 
 networks:
   jenkins-internal:                                                                                                                    

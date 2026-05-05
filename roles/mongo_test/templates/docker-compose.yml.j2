@@ -34,6 +34,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD={{ mongo_test_db_root_password }}
     volumes:
       - mongo-test:/data/db
+      - mongo-test-configdb:/data/configdb
     ports:
       - "127.0.0.1:{{ mongo_test_db_external_port }}:27017"
     networks:
@@ -42,6 +43,8 @@ services:
 volumes:
   mongo-test:
     name: mongo-test
+  mongo-test-configdb:
+    name: mongo-test-configdb
 
 networks:
   mongo-test-internal:
