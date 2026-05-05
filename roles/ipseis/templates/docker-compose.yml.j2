@@ -84,7 +84,7 @@ volumes:
 networks:
   ipseis-internal:
     name: ipseis-internal
-    driver: bridge
+    internal: true 
   traefik-public:
     name: traefik-public
     external: true
