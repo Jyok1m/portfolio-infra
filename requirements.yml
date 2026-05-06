@@ -6,3 +6,5 @@ collections:
     version: "==5.2.0"
   - name: ansible.posix
     version: "==2.1.0"
+  - name: jyok1m.docker_compose
+    version: "==1.0.0"

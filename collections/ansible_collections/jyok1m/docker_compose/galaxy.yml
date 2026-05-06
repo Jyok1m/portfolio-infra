@@ -1,0 +1,25 @@
+---
+namespace: jyok1m
+name: docker_compose
+version: 1.0.0
+readme: README.md
+authors:
+  - Joachim Jasmin <joachim.jasmin-dev@proton.me>
+description: >-
+  End-to-end Docker Compose stack deployment: directory provisioning, Jinja
+  template rendering, static file copy, image pull, and up orchestration with
+  log capture on failure.
+license:
+  - MIT
+tags:
+  - docker
+  - compose
+  - deployment
+  - infrastructure
+dependencies:
+  community.docker: ">=5.2.0"
+repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
+documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
+homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
+issues: https://github.com/Jyok1m/portfolio-infra/issues
+build_ignore: []

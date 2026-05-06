@@ -1,0 +1,73 @@
+---
+- name: "[{{ docker_compose_app_name }}] Validate inputs"
+  ansible.builtin.assert:
+    that:
+      - docker_compose_app_name | length > 0
+    fail_msg: "docker_compose_app_name is required."
+    quiet: true
+
+- name: "[{{ docker_compose_app_name }}] Ensure deployment directory exists"
+  ansible.builtin.file:
+    path: "{{ docker_compose_app_path }}"
+    state: directory
+    mode: "{{ docker_compose_dir_mode }}"
+
+- name: "[{{ docker_compose_app_name }}] Render templates"
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ docker_compose_app_path }}/{{ item.dest }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop: "{{ docker_compose_templates }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  no_log: "{{ item.no_log | default(false) }}"
+
+- name: "[{{ docker_compose_app_name }}] Copy static files"
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ docker_compose_app_path }}/{{ item.dest }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop: "{{ docker_compose_files }}"
+  loop_control:
+    label: "{{ item.dest }}"
+
+- name: "[{{ docker_compose_app_name }}] Pull images"
+  community.docker.docker_compose_v2_pull:
+    project_src: "{{ docker_compose_app_path }}"
+  register: _docker_compose_pull
+  when: docker_compose_pull
+
+- name: "[{{ docker_compose_app_name }}] Deploy stack"
+  block:
+    - name: "[{{ docker_compose_app_name }}] Bring services up"
+      community.docker.docker_compose_v2:
+        project_src: "{{ docker_compose_app_path }}"
+        state: present
+        pull: always
+        remove_orphans: "{{ docker_compose_remove_orphans }}"
+        recreate: "{{ 'always' if (_docker_compose_pull.changed | default(false)) else 'auto' }}"
+        wait: true
+        wait_timeout: "{{ docker_compose_wait_timeout }}"
+      register: _docker_compose_result
+
+    - name: "[{{ docker_compose_app_name }}] Deployment result"
+      ansible.builtin.debug:
+        msg: "{{ _docker_compose_result.actions | default('No changes') }}"
+      when: _docker_compose_result.changed
+
+  rescue:
+    - name: "[{{ docker_compose_app_name }}] Capture container logs"
+      ansible.builtin.command:
+        cmd: "docker compose logs --tail {{ docker_compose_logs_tail }}"
+        chdir: "{{ docker_compose_app_path }}"
+      register: _docker_compose_failed_logs
+      changed_when: false
+      failed_when: false
+
+    - name: "[{{ docker_compose_app_name }}] Show captured logs"
+      ansible.builtin.debug:
+        var: _docker_compose_failed_logs.stdout_lines
+
+    - name: "[{{ docker_compose_app_name }}] Fail the play"
+      ansible.builtin.fail:
+        msg: "Deployment of {{ docker_compose_app_name }} failed."

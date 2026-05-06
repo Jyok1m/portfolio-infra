@@ -5,7 +5,7 @@ TAGS ?=
 ANSIBLE_ARGS = -i $(INVENTORY_FILE) --vault-password-file $(VAULT_PASSWORD_FILE) $(if $(TAGS),--tags $(TAGS))
 
 .DEFAULT_GOAL := help
-.PHONY: help install-collections setup-hooks ping edit-vault encrypt-vault decrypt-vault dry-run run
+.PHONY: help install-collections setup-hooks ping edit-vault encrypt-vault decrypt-vault dry-run run publish-collection
 
 # ------------------------------------------------------------------ #
 #                                Help                                #
@@ -32,6 +32,9 @@ help:
 	@echo ""
 	@echo "Run options:"
 	@echo "	TAGS=<tag>		Filter by Ansible tags (e.g. make run TAGS=fail2ban)"
+	@echo ""
+	@echo "Collection:"
+	@echo "	publish-collection	Build and publish jyok1m.docker_compose to Ansible Galaxy"
 
 # ------------------------------------------------------------------ #
 #                                Setup                               #
@@ -74,3 +77,10 @@ dry-run:
 
 run:
 	ansible-playbook $(ANSIBLE_ARGS) site.yml
+
+# ------------------------------------------------------------------ #
+#                             Collection                             #
+# ------------------------------------------------------------------ #
+
+publish-collection:
+	./scripts/publish-collection.sh
