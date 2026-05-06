@@ -62,11 +62,13 @@ make encrypt-vault
 make decrypt-vault
 ```
 
-## Testing the hardening collection
+## Testing the collections
+
+Each collection ships a single Molecule scenario under `extensions/molecule/default/`:
 
 ```bash
-cd collections/ansible_collections/jyok1m/hardening/extensions
-molecule test
+cd collections/ansible_collections/jyok1m/hardening/extensions    && molecule test
+cd collections/ansible_collections/jyok1m/docker_compose/extensions && molecule test
 ```
 
 ## Publishing collections

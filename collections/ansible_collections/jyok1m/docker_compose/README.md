@@ -42,6 +42,15 @@ ansible-galaxy collection install jyok1m.docker_compose
 
 See `roles/deploy/README.md` for the full variable reference.
 
+## Testing
+
+A minimal Molecule scenario deploys a tiny `alpine` stack inside a Debian 13 systemd container:
+
+```bash
+cd extensions
+molecule test
+```
+
 ## License
 
 MIT

@@ -1,0 +1,6 @@
+services:
+  hello:
+    image: alpine:latest
+    container_name: molecule-test-hello
+    command: ["sleep", "infinity"]
+    restart: unless-stopped
