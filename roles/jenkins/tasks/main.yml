@@ -1,14 +1,8 @@
 ---
-- name: Création du répertoire de déploiement
-  ansible.builtin.file:
-    path: "{{ app_base_path }}/jenkins"
-    state: directory
-    mode: "0755"
-
 - name: Génération du Dockerfile Jenkins depuis le template
   ansible.builtin.template:
     src: Dockerfile.j2
-    dest: "{{ app_base_path }}/jenkins/Dockerfile"
+    dest: "{{ app_path }}/Dockerfile"
     mode: "0644"
 
 - name: Construction et publication de l'image Jenkins
@@ -16,28 +10,23 @@
     name: "{{ jenkins_image_name }}"
     tag: "{{ jenkins_image_tag }}"
     build:
-      path: "{{ app_base_path }}/jenkins"
+      path: "{{ app_path }}"
       dockerfile: Dockerfile
       pull: true
     source: build
     push: true
     force_source: false
 
-- name: Application du template docker-compose.yml
-  ansible.builtin.template:
-    src: docker-compose.yml.j2
-    dest: "{{ app_base_path }}/jenkins/docker-compose.yml"
-    mode: "0644"
-  no_log: true
-
-- name: Démarrage des services via Compose
-  community.docker.docker_compose_v2:
-    project_src: "{{ app_base_path }}/jenkins"
-    state: present
-    pull: always
-    remove_orphans: true
-    wait: true
-    wait_timeout: 120
+- name: Deploy {{ app_name }}
+  ansible.builtin.import_role:
+    name: jyok1m.docker_compose.deploy
+  vars:
+    docker_compose_app_name: "{{ app_name }}"
+    docker_compose_app_path: "{{ app_path }}"
+    docker_compose_templates:
+      - src: docker-compose.yml.j2
+        dest: docker-compose.yml
+        no_log: true
 
 - name: Vérification de la présence du known_hosts dans le conteneur Jenkins
   ansible.builtin.command:
