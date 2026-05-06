@@ -1,4 +1,7 @@
 ---
+app_name: portfolio
+app_path: /opt/{{ app_name }}
+
 portfolio_image_name: jyok1m/portfolio
 portfolio_image_tag: latest
 portfolio_image: "{{ portfolio_image_name }}:{{ portfolio_image_tag }}"
