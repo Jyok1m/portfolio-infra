@@ -1,0 +1,24 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Install openssh-server (test fixture)
+      ansible.builtin.apt:
+        name: openssh-server
+        state: present
+        update_cache: true
+  roles:
+    - role: jyok1m.hardening.ssh_hardening
+      vars:
+        ssh_port: 2222
+        ssh_allowed_users: [root, deploy]
+    - role: jyok1m.hardening.firewall
+      vars:
+        ufw_allowed_ports:
+          - { port: 2222, proto: tcp, comment: SSH }
+          - { port: 80, proto: tcp, comment: HTTP }
+    - role: jyok1m.hardening.fail2ban
+      vars:
+        fail2ban_ssh_port: 2222
+        fail2ban_ban_action: iptables-multiport
