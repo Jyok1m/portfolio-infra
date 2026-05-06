@@ -1,13 +1,7 @@
 ---
-- name: Création du répertoire de déploiement
-  ansible.builtin.file:
-    path: "{{ app_path }}"
-    state: directory
-    mode: "0755"
-
 - name: Création du ACME.json (si manquant) pour Traefik
   ansible.builtin.file:
-    path: "{{ app_path }}/acme.json"
+    path: "{{ data_path }}/acme.json"
     state: touch
     mode: "0600"
     modification_time: preserve
