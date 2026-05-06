@@ -1,4 +1,5 @@
 .vault_pass
 .env
 .claude
-collections/ansible_collections/jyok1m/docker_compose/*.tar.gz
+.venv
+collections/ansible_collections/jyok1m/*/*.tar.gz
