@@ -8,5 +8,4 @@
     docker_compose_templates:
       - src: docker-compose.yml.j2
         dest: docker-compose.yml
-        mode: "0644"
         no_log: true
