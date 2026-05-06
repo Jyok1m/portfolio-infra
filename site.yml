@@ -9,34 +9,13 @@
       tags: always
   roles:
     # Initial setup
-    - role: jyok1m.hardening.ssh_hardening
-      vars:
-        ssh_port: "{{ ovh_portfolio_port }}"
-        ssh_allowed_users: ["{{ ovh_portfolio_user }}", "jenkins"]
-      tags: [setup, security, ssh_hardening]
-
-    - role: jyok1m.hardening.firewall
-      vars:
-        ufw_allowed_ports:
-          - { port: "{{ ovh_portfolio_port }}", proto: tcp, comment: SSH }
-          - { port: 80, proto: tcp, comment: HTTP }
-          - { port: 443, proto: tcp, comment: HTTPS }
-      tags: [setup, security, firewall]
-
-    - role: jyok1m.hardening.fail2ban
-      vars:
-        fail2ban_ssh_port: "{{ ovh_portfolio_port }}"
-      tags: [setup, security, fail2ban]
-
-    - { role: unattended_upgrades, tags: [setup, security, unattended_upgrades] }
-
-    # Engines setup
-    - { role: docker, tags: [setup, common, docker] }
+    - { role: hardening, tags: [setup, hardening] }
+    - { role: docker, tags: [setup, docker] }
 
     # Common apps via Docker
-    - { role: traefik, tags: [apps, common, traefik] }
-    - { role: jenkins, tags: [apps, common, jenkins] }
-    - { role: monitoring, tags: [apps, common, monitoring] }
+    - { role: traefik, tags: [common, traefik] }
+    - { role: jenkins, tags: [common, jenkins] }
+    - { role: monitoring, tags: [common, monitoring] }
 
     # Client apps
     - { role: portfolio, tags: [apps, portfolio] }
