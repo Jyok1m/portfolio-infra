@@ -1,7 +1,7 @@
 ---
 namespace: jyok1m
 name: docker_compose
-version: 1.0.1
+version: 1.0.2
 readme: README.md
 authors:
   - Joachim Jasmin <joachim.jasmin-dev@proton.me>
@@ -22,4 +22,6 @@ repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansi
 documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
 homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
 issues: https://github.com/Jyok1m/portfolio-infra/issues
-build_ignore: []
+build_ignore:
+  - extensions/molecule
+  - "*.tar.gz"
