@@ -25,9 +25,13 @@ Deploys a Docker Compose stack: provisions the target directory, renders Jinja t
 
 ## Example
 
+This is a **role**, not a module. Invoke it with `import_role` (or `include_role`) and pass variables under `vars:`.
+
 ```yaml
 - name: Deploy my-app
-  jyok1m.docker_compose.deploy:
+  ansible.builtin.import_role:
+    name: jyok1m.docker_compose.deploy
+  vars:
     docker_compose_app_name: my-app
     docker_compose_templates:
       - src: docker-compose.yml.j2

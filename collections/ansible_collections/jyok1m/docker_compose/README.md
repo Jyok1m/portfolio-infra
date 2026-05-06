@@ -22,9 +22,13 @@ ansible-galaxy collection install jyok1m.docker_compose
 
 ## Quick start
 
+`deploy` is a **role**, not a module — invoke it with `import_role` (or `include_role`) and pass its variables under `vars:`.
+
 ```yaml
 - name: Deploy my app
-  jyok1m.docker_compose.deploy:
+  ansible.builtin.import_role:
+    name: jyok1m.docker_compose.deploy
+  vars:
     docker_compose_app_name: my_app
     docker_compose_app_path: /opt/my_app
     docker_compose_templates:
@@ -33,6 +37,8 @@ ansible-galaxy collection install jyok1m.docker_compose
         mode: "0644"
         no_log: true
 ```
+
+`src` paths in `docker_compose_templates` / `docker_compose_files` resolve against the **calling role's** `templates/` and `files/` directories.
 
 See `roles/deploy/README.md` for the full variable reference.
 
