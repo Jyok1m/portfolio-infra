@@ -77,6 +77,8 @@ make encrypt-vault
 make decrypt-vault
 ```
 
+The pre-commit hook auto-encrypts `vault.yml` before each commit if it's staged. After committing vault changes, run `make decrypt-vault` to put the working tree back into editable plaintext.
+
 ## Testing the collections
 
 Each collection ships a single Molecule scenario under `extensions/molecule/default/`. Docker must be running.
