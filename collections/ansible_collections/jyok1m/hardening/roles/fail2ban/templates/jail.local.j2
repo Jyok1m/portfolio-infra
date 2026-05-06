@@ -1,0 +1,11 @@
+# Ansible managed — do not edit manually
+
+[DEFAULT]
+bantime = {{ fail2ban_ban_time }}
+findtime = {{ fail2ban_find_time }}
+maxretry = {{ fail2ban_max_retry }}
+banaction = {{ fail2ban_ban_action }}
+
+[sshd]
+enabled = {{ 'true' if fail2ban_ssh_enabled else 'false' }}
+port = {{ fail2ban_ssh_port }}

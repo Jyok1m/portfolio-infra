@@ -1,0 +1,18 @@
+---
+- name: Remove cloud-init sshd drop-in
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d/50-cloud-init.conf
+    state: absent
+  when: ssh_remove_cloud_init_dropin
+  notify: Restart sshd
+
+- name: Apply sshd config template
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Restart sshd

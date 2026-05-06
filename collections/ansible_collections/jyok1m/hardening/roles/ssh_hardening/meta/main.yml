@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: ssh_hardening
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Renders a hardened sshd_config and reloads sshd safely (validate before apply).
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - ssh
+    - hardening
+    - security
+
+dependencies: []

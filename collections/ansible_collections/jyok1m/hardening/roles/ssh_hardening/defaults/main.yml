@@ -1,0 +1,10 @@
+---
+ssh_port: 22
+ssh_allowed_users: []
+ssh_max_auth_tries: 5
+ssh_login_grace_time: 30
+ssh_client_alive_interval: 120
+ssh_client_alive_count_max: 2
+ssh_x11_forwarding: false
+ssh_tcp_forwarding: true
+ssh_remove_cloud_init_dropin: true

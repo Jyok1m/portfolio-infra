@@ -1,0 +1,29 @@
+# Ansible managed — do not edit manually
+
+Port {{ ssh_port }}
+
+# Authentication
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+MaxAuthTries {{ ssh_max_auth_tries }}
+LoginGraceTime {{ ssh_login_grace_time }}
+{% if ssh_allowed_users | length > 0 %}
+AllowUsers {{ ssh_allowed_users | join(' ') }}
+{% endif %}
+KbdInteractiveAuthentication no
+
+# Network
+X11Forwarding {{ 'yes' if ssh_x11_forwarding else 'no' }}
+AllowTcpForwarding {{ 'yes' if ssh_tcp_forwarding else 'no' }}
+
+# Session
+UsePAM yes
+ClientAliveInterval {{ ssh_client_alive_interval }}
+ClientAliveCountMax {{ ssh_client_alive_count_max }}
+PrintMotd no
+AcceptEnv LANG LC_*
+
+# Subsystems
+Subsystem sftp /usr/lib/openssh/sftp-server

@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ $# -lt 1 ]]; then
+  echo "usage: $0 <collection_name>" >&2
+  echo "example: $0 docker_compose" >&2
+  exit 1
+fi
+
+COLLECTION_NAME="$1"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-COLLECTION_DIR="${REPO_ROOT}/collections/ansible_collections/jyok1m/docker_compose"
+COLLECTION_DIR="${REPO_ROOT}/collections/ansible_collections/jyok1m/${COLLECTION_NAME}"
 ENV_FILE="${REPO_ROOT}/.env"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
