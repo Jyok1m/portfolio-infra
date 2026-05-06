@@ -1,5 +1,6 @@
 ---
-- hosts: ovh_host
+- name: Provision portfolio-infra on the OVH host
+  hosts: ovh_host
   pre_tasks:
     - name: Update APT cache
       ansible.builtin.apt:

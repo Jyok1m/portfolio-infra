@@ -3,13 +3,13 @@
   hosts: all
   become: true
   tasks:
-    - name: docker-compose.yml is rendered
+    - name: Check that docker-compose.yml is rendered
       ansible.builtin.stat:
         path: /opt/molecule_test/docker-compose.yml
       register: compose_file
       failed_when: not compose_file.stat.exists
 
-    - name: hello service is running
+    - name: Check that the hello service is running
       ansible.builtin.command: docker compose ps --status running --quiet
       args:
         chdir: /opt/molecule_test

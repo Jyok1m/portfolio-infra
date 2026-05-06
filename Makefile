@@ -5,7 +5,7 @@ TAGS ?=
 ANSIBLE_ARGS = -i $(INVENTORY_FILE) --vault-password-file $(VAULT_PASSWORD_FILE) $(if $(TAGS),--tags $(TAGS))
 
 .DEFAULT_GOAL := help
-.PHONY: help install-collections setup-hooks lint ping edit-vault encrypt-vault encrypt-vault-and-stage decrypt-vault dry-run run publish-collection publish-collection-hardening
+.PHONY: help install-collections setup-hooks lint ping edit-vault encrypt-vault encrypt-vault-and-stage decrypt-vault dry-run run publish-collection-docker_compose publish-collection-hardening
 
 # ------------------------------------------------------------------ #
 #                                Help                                #
@@ -35,7 +35,7 @@ help:
 	@echo "	TAGS=<tag>			Filter by Ansible tags (e.g. make run TAGS=fail2ban)"
 	@echo ""
 	@echo "Collections:"
-	@echo "	publish-collection		Build and publish jyok1m.docker_compose to Ansible Galaxy"
+	@echo "	publish-collection-docker_compose		Build and publish jyok1m.docker_compose to Ansible Galaxy"
 	@echo "	publish-collection-hardening	Build and publish jyok1m.hardening to Ansible Galaxy"
 
 # ------------------------------------------------------------------ #
@@ -60,7 +60,7 @@ ping:
 
 lint:
 	@command -v pre-commit >/dev/null 2>&1 || { echo "error: pre-commit not installed. Run: pip install pre-commit"; exit 1; }
-	pre-commit run --all-files
+	SKIP=encrypt-vault,decrypt-vault pre-commit run --all-files
 
 # ------------------------------------------------------------------ #
 #                                Vault                               #
@@ -100,7 +100,7 @@ run:
 #                             Collection                             #
 # ------------------------------------------------------------------ #
 
-publish-collection:
+publish-collection-docker_compose:
 	./scripts/publish-collection.sh docker_compose
 
 publish-collection-hardening:

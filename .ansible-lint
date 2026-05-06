@@ -6,9 +6,15 @@ exclude_paths:
   - .git/
   - .pre-commit-cache/
   - "**/*.tar.gz"
+  # Molecule scenarios reference collection roles (jyok1m.hardening.*) which
+  # ansible-lint cannot resolve outside the molecule runtime context.
+  - "**/extensions/molecule/"
 
 skip_list:
   - var-naming[no-role-prefix]
   - galaxy[no-changelog]
+  # docker_compose.deploy uses [{{ app_name }}] Action as a multi-app log prefix;
+  # this is intentional even though Jinja appears at the start of the name.
+  - name[template]
 
 use_default_rules: true

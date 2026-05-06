@@ -3,7 +3,7 @@
   hosts: all
   become: true
   tasks:
-    - name: sshd_config has expected port and directives
+    - name: Check that sshd_config has expected port and directives
       ansible.builtin.command: grep -E '^(Port 2222|PermitRootLogin no|PasswordAuthentication no)$' /etc/ssh/sshd_config
       changed_when: false
 
@@ -15,6 +15,6 @@
         - "'Status: active' not in ufw_status.stdout"
         - "'2222/tcp' not in ufw_status.stdout"
 
-    - name: jail.local has expected sshd port
+    - name: Check that jail.local has expected sshd port
       ansible.builtin.command: grep -E '^port = 2222$' /etc/fail2ban/jail.local
       changed_when: false
