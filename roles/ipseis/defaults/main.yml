@@ -1,4 +1,7 @@
 ---
+app_name: ipseis
+app_path: /opt/{{ app_name }}
+
 ipseis_image_name: jyok1m/ipseis-backend
 ipseis_image_tag: latest
 ipseis_image: "{{ ipseis_image_name }}:{{ ipseis_image_tag }}"
