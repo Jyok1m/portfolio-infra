@@ -12,42 +12,8 @@
     mode: "0644"
   no_log: true
 
-- name: Pull des images depuis le registre
-  community.docker.docker_compose_v2_pull:
-    project_src: "{{ app_base_path }}/ipseis"
-  register: image_pull
-
-- name: Déploiement de la stack
-  block:
-    - name: Lancement des services
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_base_path }}/ipseis"
-        state: present
-        pull: always
-        remove_orphans: true
-        recreate: "{{ 'always' if image_pull.changed else 'auto' }}"
-        wait: true
-        wait_timeout: 120
-      register: compose_file
-
-    - name: Affichage du résultat du déploiement
-      ansible.builtin.debug:
-        msg: "{{ compose_file.actions | default('Aucun changement') }}"
-      when: compose_file.changed
-
-  rescue:
-    - name: Récupération des logs en cas d'échec
-      ansible.builtin.command:
-        cmd: docker compose logs --tail 100
-        chdir: "{{ app_base_path }}/ipseis"
-      register: failed_logs
-      changed_when: false
-      failed_when: false
-
-    - name: Affichage des logs
-      ansible.builtin.debug:
-        var: failed_logs.stdout_lines
-
-    - name: Échec du déploiement
-      ansible.builtin.fail:
-        msg: "Le déploiement a échoué : voir les logs ci-dessus."
+- name: Déploiement via docker compose
+  ansible.builtin.include_role:
+    name: utils.compose_deploy
+  vars:
+    compose_deploy_app_name: ipseis
