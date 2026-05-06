@@ -7,7 +7,7 @@ collections:
   - name: ansible.posix
     version: "==2.1.0"
   - name: jyok1m.docker_compose
-    version: "==1.0.1"
+    version: "==1.0.2"
   # jyok1m.hardening is currently consumed via the vendored copy in
   # collections/. Once published, pin it here:
   # - name: jyok1m.hardening
