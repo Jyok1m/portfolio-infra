@@ -1,4 +1,7 @@
 ---
+app_name: mongo_test
+app_path: /opt/{{ app_name }}
+
 mongo_test_db_image_name: mongo
 mongo_test_db_image_tag: 8.2.5
 mongo_test_db_image: "{{ mongo_test_db_image_name }}:{{ mongo_test_db_image_tag }}"
