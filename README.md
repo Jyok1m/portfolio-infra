@@ -36,18 +36,33 @@ The `jyok1m.docker_compose` collection (vendored under `collections/`) provides 
 
 ## Requirements
 
-- Ansible `>= 2.20`
-- Python tooling: `pip install -r requirements-dev.txt`
+- Python `>= 3.10` (`python3 --version`)
+- Docker (Desktop, Colima, or OrbStack — must be running for Molecule)
 - A `.vault_pass` file at the repo root
 - A `.env` file with `ANSIBLE_GALAXY_TOKEN=...` (only needed to publish the collections)
 - SSH access to the target host configured via the variables in `inventory.yml`
 
+## Local setup (first time)
+
+Create a virtualenv and install the Python tooling (Ansible, lint, Molecule, pre-commit). Doing this in a venv keeps the system Python clean.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+Activate the venv at the start of every new shell (`source .venv/bin/activate`). Then bootstrap the repo:
+
+```bash
+make install-collections   # Pinned Ansible collections
+make setup-hooks           # Pre-commit hooks (yamllint, ansible-lint, vault encrypt/decrypt)
+```
+
 ## Usage
 
 ```bash
-make install-collections   # Install pinned collections
-make setup-hooks           # Install pre-commit hooks
-make ping                  # Smoke-test connectivity
+make ping                  # Smoke-test connectivity to the OVH host
 make lint                  # Run yamllint + ansible-lint over the repo
 make dry-run               # Run the playbook in --check --diff mode
 make run                   # Run the playbook
@@ -64,11 +79,20 @@ make decrypt-vault
 
 ## Testing the collections
 
-Each collection ships a single Molecule scenario under `extensions/molecule/default/`:
+Each collection ships a single Molecule scenario under `extensions/molecule/default/`. Docker must be running.
 
 ```bash
 cd collections/ansible_collections/jyok1m/hardening/extensions    && molecule test
 cd collections/ansible_collections/jyok1m/docker_compose/extensions && molecule test
+```
+
+`molecule test` runs the full cycle: create container → converge (apply role) → idempotence (re-apply, fail on `changed`) → verify → destroy. While iterating, prefer the short cycle that keeps the container alive between runs:
+
+```bash
+molecule converge   # apply the role
+molecule verify     # re-run assertions
+molecule login      # shell into the container
+molecule destroy    # cleanup when done
 ```
 
 ## Publishing collections
