@@ -8,7 +8,7 @@ collections:
     version: "==2.1.0"
   - name: jyok1m.docker_compose
     version: "==1.0.2"
-  # jyok1m.hardening is not yet published on Galaxy: install from the
-  # vendored source. Once published, replace with a `version:` pin.
-  - source: ./collections/ansible_collections/jyok1m/hardening
-    type: dir
+  - name: jyok1m.hardening
+    version: "==1.0.0"
+  # - source: ./collections/ansible_collections/jyok1m/hardening
+  #   type: dir
