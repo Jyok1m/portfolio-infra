@@ -18,7 +18,5 @@ platforms:
       - /tmp
 provisioner:
   name: ansible
-  env:
-    ANSIBLE_COLLECTIONS_PATH: "${MOLECULE_PROJECT_DIRECTORY}/../../../../../..:${HOME}/.ansible/collections:/usr/share/ansible/collections"
 verifier:
   name: ansible
