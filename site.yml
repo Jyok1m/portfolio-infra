@@ -1,16 +1,32 @@
 ---
 - hosts: ovh_host
   pre_tasks:
-    - name: Mise à jour d'APT
+    - name: Update APT cache
       ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 3600
       tags: always
   roles:
     # Initial setup
-    - { role: ssh_hardening, tags: [setup, security, ssh_hardening] }
-    - { role: firewall, tags: [setup, security, firewall] }
-    - { role: fail2ban, tags: [setup, security, fail2ban] }
+    - role: jyok1m.hardening.ssh_hardening
+      vars:
+        ssh_port: "{{ ovh_portfolio_port }}"
+        ssh_allowed_users: ["{{ ovh_portfolio_user }}", "jenkins"]
+      tags: [setup, security, ssh_hardening]
+
+    - role: jyok1m.hardening.firewall
+      vars:
+        ufw_allowed_ports:
+          - { port: "{{ ovh_portfolio_port }}", proto: tcp, comment: SSH }
+          - { port: 80, proto: tcp, comment: HTTP }
+          - { port: 443, proto: tcp, comment: HTTPS }
+      tags: [setup, security, firewall]
+
+    - role: jyok1m.hardening.fail2ban
+      vars:
+        fail2ban_ssh_port: "{{ ovh_portfolio_port }}"
+      tags: [setup, security, fail2ban]
+
     - { role: unattended_upgrades, tags: [setup, security, unattended_upgrades] }
 
     # Engines setup
