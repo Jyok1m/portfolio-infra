@@ -1,0 +1,35 @@
+---
+default_install_hook_types:
+  - pre-commit
+  - post-commit
+
+repos:
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args: ["-c=.yamllint"]
+
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v25.6.1
+    hooks:
+      - id: ansible-lint
+        files: \.(yaml|yml)$
+
+  - repo: local
+    hooks:
+      - id: encrypt-vault
+        name: Encrypt vault before commit
+        entry: make encrypt-vault-and-stage
+        language: system
+        files: ^group_vars/portfolio_group/vault\.yml$
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: decrypt-vault
+        name: Decrypt vault for local editing
+        entry: make decrypt-vault
+        language: system
+        always_run: true
+        pass_filenames: false
+        stages: [post-commit]
