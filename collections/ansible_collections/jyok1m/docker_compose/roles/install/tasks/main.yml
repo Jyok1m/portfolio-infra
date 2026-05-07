@@ -54,3 +54,20 @@
     groups: docker
     append: true
   loop: "{{ docker_install_users }}"
+
+- name: Validate registry login inputs
+  ansible.builtin.assert:
+    that:
+      - docker_install_username | length > 0
+      - docker_install_password | length > 0
+    fail_msg: "docker_install_login is true but username or password is empty."
+    quiet: true
+  when: docker_install_login
+
+- name: Log in to the Docker registry
+  community.docker.docker_login:
+    registry_url: "{{ docker_install_registry_url }}"
+    username: "{{ docker_install_username }}"
+    password: "{{ docker_install_password }}"
+  when: docker_install_login
+  no_log: true

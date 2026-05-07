@@ -16,6 +16,10 @@ Installs Docker Engine and the Compose v2 plugin from the official Docker apt re
 | `docker_install_service_state`    | `started`                                                                        | Final state of the `docker` service.                 |
 | `docker_install_service_enabled`  | `true`                                                                           | Whether `docker` is enabled at boot.                 |
 | `docker_install_users`            | `[]`                                                                             | List of users to add to the `docker` group.          |
+| `docker_install_login`            | `false`                                                                          | Whether to log in to a Docker registry after install. |
+| `docker_install_registry_url`     | `https://index.docker.io/v1/`                                                    | Registry URL (Docker Hub by default).                |
+| `docker_install_username`         | `""`                                                                             | Registry username (required when `docker_install_login: true`). |
+| `docker_install_password`         | `""`                                                                             | Registry password or token (required when `docker_install_login: true`). |
 
 ## Example
 
@@ -27,4 +31,17 @@ This is a **role**, not a module. Invoke it with `import_role` (or `include_role
     name: jyok1m.docker_compose.install
   vars:
     docker_install_users: [deploy, jenkins]
+```
+
+With Docker Hub login (credentials from your vault):
+
+```yaml
+- name: Install Docker and authenticate against Docker Hub
+  ansible.builtin.import_role:
+    name: jyok1m.docker_compose.install
+  vars:
+    docker_install_users: [deploy]
+    docker_install_login: true
+    docker_install_username: "{{ vault_docker_username }}"
+    docker_install_password: "{{ vault_docker_token }}"
 ```
