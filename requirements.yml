@@ -9,6 +9,6 @@ collections:
   - name: jyok1m.docker_compose
     version: "==1.0.2"
   - name: jyok1m.hardening
-    version: "==1.0.0"
+    version: "==1.0.1"
   # - source: ./collections/ansible_collections/jyok1m/hardening
   #   type: dir
