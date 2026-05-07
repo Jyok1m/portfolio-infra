@@ -5,7 +5,7 @@ TAGS ?=
 ANSIBLE_ARGS = -i $(INVENTORY_FILE) --vault-password-file $(VAULT_PASSWORD_FILE) $(if $(TAGS),--tags $(TAGS))
 
 .DEFAULT_GOAL := help
-.PHONY: help install-collections setup-hooks lint ping edit-vault encrypt-vault encrypt-vault-and-stage decrypt-vault dry-run run publish-collection-docker_compose publish-collection-hardening
+.PHONY: help install-collections setup-hooks lint ping edit-vault encrypt-vault encrypt-vault-and-stage decrypt-vault dry-run run molecule-test publish-collection-docker_compose publish-collection-hardening publish-collection-k3s
 
 # ------------------------------------------------------------------ #
 #                                Help                                #
@@ -21,6 +21,7 @@ help:
 	@echo "Tests:"
 	@echo "	ping				Ping the server to check connectivity"
 	@echo "	lint				Run yamllint + ansible-lint on the whole repo"
+	@echo "	molecule-test			Run molecule test on a collection (TAGS=<name>)"
 	@echo ""
 	@echo "Vault:"
 	@echo "	edit-vault			Edit the Ansible vault file"
@@ -35,8 +36,13 @@ help:
 	@echo "	TAGS=<tag>			Filter by Ansible tags (e.g. make run TAGS=fail2ban)"
 	@echo ""
 	@echo "Collections:"
-	@echo "	publish-collection-docker_compose		Build and publish jyok1m.docker_compose to Ansible Galaxy"
-	@echo "	publish-collection-hardening	Build and publish jyok1m.hardening to Ansible Galaxy"
+	@echo "	publish-collection-docker_compose	Build and publish jyok1m.docker_compose to Ansible Galaxy"
+	@echo "	publish-collection-hardening		Build and publish jyok1m.hardening to Ansible Galaxy"
+	@echo "	publish-collection-k3s			Build and publish jyok1m.k3s to Ansible Galaxy"
+	@echo ""
+	@echo "Molecule:"
+	@echo "	molecule-test TAGS=<name>		Run molecule test on collections/<name> (all scenarios)"
+	@echo "	  + SCENARIO=<name>			Run only one scenario (e.g. SCENARIO=agent)"
 
 # ------------------------------------------------------------------ #
 #                                Setup                               #
@@ -61,6 +67,18 @@ ping:
 lint:
 	@command -v pre-commit >/dev/null 2>&1 || { echo "error: pre-commit not installed. Run: pip install pre-commit"; exit 1; }
 	SKIP=encrypt-vault,decrypt-vault pre-commit run --all-files
+
+molecule-test:
+	@if [ -z "$(TAGS)" ]; then \
+		echo "error: TAGS not set. Usage: make molecule-test TAGS=<name> [SCENARIO=<name>]"; \
+		echo "available collections: $$(ls collections 2>/dev/null | tr '\n' ' ')"; \
+		exit 1; \
+	fi
+	@if [ ! -d "collections/$(TAGS)/extensions" ]; then \
+		echo "error: collections/$(TAGS)/extensions not found"; \
+		exit 1; \
+	fi
+	cd collections/$(TAGS)/extensions && molecule test $(if $(SCENARIO),-s $(SCENARIO),--all)
 
 # ------------------------------------------------------------------ #
 #                                Vault                               #
@@ -105,3 +123,6 @@ publish-collection-docker_compose:
 
 publish-collection-hardening:
 	./scripts/publish-collection.sh hardening
+
+publish-collection-k3s:
+	./scripts/publish-collection.sh k3s
