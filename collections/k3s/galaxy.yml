@@ -1,0 +1,26 @@
+---
+namespace: jyok1m
+name: k3s
+version: 1.0.0
+readme: README.md
+authors:
+  - Joachim Jasmin <joachim.jasmin-dev@proton.me>
+description: >-
+  Install and configure k3s on Debian Trixie — server (control plane) and
+  agent (worker) roles, ready for single-node, master + worker, master + many
+  workers, or workers-only topologies.
+license:
+  - MIT
+tags:
+  - k3s
+  - kubernetes
+  - cluster
+  - infrastructure
+dependencies: {}
+repository: https://github.com/Jyok1m/portfolio-infra
+documentation: https://github.com/Jyok1m/portfolio-infra
+homepage: https://github.com/Jyok1m/portfolio-infra
+issues: https://github.com/Jyok1m/portfolio-infra/issues
+build_ignore:
+  - extensions/molecule
+  - "*.tar.gz"

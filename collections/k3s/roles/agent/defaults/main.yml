@@ -1,0 +1,33 @@
+---
+# k3s version to install. Should match the server's version.
+# Leave empty to pull the latest stable from get.k3s.io.
+k3s_version: ""
+
+# APT prerequisites pulled in before fetching the install script.
+k3s_agent_prerequisites:
+  - curl
+  - ca-certificates
+
+# Install script source and on-disk path.
+k3s_install_script_url: https://get.k3s.io
+k3s_install_script_path: /usr/local/bin/k3s-install.sh
+
+# URL of the k3s server (e.g. https://10.0.0.1:6443). Required.
+k3s_agent_server_url: ""
+
+# Cluster token — must match the server's k3s_server_token. Required.
+# Store this in ansible-vault.
+k3s_agent_token: ""
+
+# Extra arguments appended to `INSTALL_K3S_EXEC=agent ...`.
+# Common examples:
+#   --node-label workload=app
+#   --node-taint dedicated=app:NoSchedule
+k3s_agent_exec_args: ""
+
+# Extra environment variables passed to the install script.
+k3s_agent_extra_env: {}
+
+# systemd service state after install.
+k3s_agent_service_state: started
+k3s_agent_service_enabled: true

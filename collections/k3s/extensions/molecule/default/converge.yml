@@ -1,0 +1,30 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  pre_tasks:
+    # k3s isn't started in DinD (cgroups / iptables make it unreliable), so the
+    # server process never gets to create /var/lib/rancher/k3s/server/node-token.
+    # Stub it so the role's slurp + set_fact + debug path can be exercised end-to-end.
+    - name: Stub the k3s server state dir
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s/server
+        state: directory
+        mode: "0700"
+
+    - name: Stub the node-token file
+      ansible.builtin.copy:
+        dest: /var/lib/rancher/k3s/server/node-token
+        content: "K10fakemoleculetoken::server:fakeclustersecret\n"
+        mode: "0600"
+  tasks:
+    - name: Apply the k3s server role (skip start — k3s in DinD is unreliable)
+      ansible.builtin.import_role:
+        name: jyok1m.k3s.server
+      vars:
+        k3s_version: v1.31.4+k3s1
+        k3s_server_extra_env:
+          INSTALL_K3S_SKIP_START: "true"
+          INSTALL_K3S_SKIP_ENABLE: "true"
+        k3s_server_service_state: skip
+        k3s_server_service_enabled: false

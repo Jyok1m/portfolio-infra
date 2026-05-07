@@ -1,0 +1,39 @@
+---
+# k3s version to install (e.g. v1.31.4+k3s1).
+# Leave empty to pull the latest stable from get.k3s.io.
+k3s_version: ""
+
+# APT prerequisites pulled in before fetching the install script.
+k3s_server_prerequisites:
+  - curl
+  - ca-certificates
+
+# Install script source and on-disk path.
+k3s_install_script_url: https://get.k3s.io
+k3s_install_script_path: /usr/local/bin/k3s-install.sh
+
+# Shared cluster token. Optional.
+#   - Empty (default): k3s generates one on first start. The role then reads
+#     `/var/lib/rancher/k3s/server/node-token` and prints it once via debug,
+#     so you can copy it into your ansible-vault. On subsequent runs the file
+#     already exists and the value is reused — fully idempotent.
+#   - Set: passed as `K3S_TOKEN` to the install script and not displayed.
+k3s_server_token: ""
+
+# Extra arguments appended to `INSTALL_K3S_EXEC=server ...`.
+# Common examples:
+#   --disable=traefik           skip the bundled Traefik ingress
+#   --disable=servicelb         skip the bundled service load balancer
+#   --tls-san=cluster.example   add an extra SAN to the API cert
+#   --node-taint=key=value:NoSchedule
+k3s_server_exec_args: ""
+
+# Extra environment variables passed to the install script.
+# Useful in CI / molecule:
+#   INSTALL_K3S_SKIP_START: "true"
+#   INSTALL_K3S_SKIP_ENABLE: "true"
+k3s_server_extra_env: {}
+
+# systemd service state after install.
+k3s_server_service_state: started
+k3s_server_service_enabled: true

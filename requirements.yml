@@ -10,5 +10,7 @@ collections:
     version: "==1.1.1"
   - name: jyok1m.hardening
     version: "==1.0.2"
-  # - source: ./collections/hardening
+  - name: jyok1m.k3s
+    version: "==1.0.0"
+  # - source: ./collections/k3s
   #   type: dir

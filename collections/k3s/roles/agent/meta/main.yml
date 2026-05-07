@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: agent
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Installs and configures a k3s agent (worker) node and joins it to an existing k3s server.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - k3s
+    - kubernetes
+    - agent
+    - worker
+
+dependencies: []

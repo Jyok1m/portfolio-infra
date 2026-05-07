@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: server
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Installs and configures a k3s server (control plane) node via the official get.k3s.io script.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - k3s
+    - kubernetes
+    - server
+    - control-plane
+
+dependencies: []

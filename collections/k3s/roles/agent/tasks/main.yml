@@ -1,0 +1,55 @@
+---
+- name: Validate agent inputs
+  ansible.builtin.assert:
+    that:
+      - k3s_agent_server_url | length > 0
+      - k3s_agent_token | length > 0
+    fail_msg: "k3s_agent_server_url and k3s_agent_token must both be set."
+    quiet: true
+
+- name: Install APT prerequisites
+  ansible.builtin.apt:
+    name: "{{ k3s_agent_prerequisites }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Download the k3s install script
+  ansible.builtin.get_url:
+    url: "{{ k3s_install_script_url }}"
+    dest: "{{ k3s_install_script_path }}"
+    mode: "0755"
+
+- name: Check whether the k3s binary is already present
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s
+  register: _k3s_agent_binary
+
+- name: Read the installed k3s version (if any)
+  ansible.builtin.command: /usr/local/bin/k3s --version
+  register: _k3s_agent_version
+  changed_when: false
+  failed_when: false
+  when: _k3s_agent_binary.stat.exists
+
+- name: Install or upgrade k3s agent
+  ansible.builtin.command: "{{ k3s_install_script_path }}"
+  environment: >-
+    {{ {
+         'INSTALL_K3S_VERSION': k3s_version,
+         'INSTALL_K3S_EXEC': ('agent ' ~ k3s_agent_exec_args) | trim,
+         'K3S_URL': k3s_agent_server_url,
+         'K3S_TOKEN': k3s_agent_token,
+       } | combine(k3s_agent_extra_env) }}
+  when: >-
+    not _k3s_agent_binary.stat.exists
+    or (k3s_version | length > 0
+        and k3s_version not in (_k3s_agent_version.stdout | default('')))
+  changed_when: true
+
+- name: Ensure k3s-agent is started and enabled
+  ansible.builtin.service:
+    name: k3s-agent
+    state: "{{ k3s_agent_service_state }}"
+    enabled: "{{ k3s_agent_service_enabled }}"
+  when: k3s_agent_service_state != 'skip'
