@@ -1,4 +1,4 @@
-# `jyok1m.docker_compose.deploy`
+# jyok1m.docker_compose.deploy
 
 Deploys a Docker Compose stack: provisions the target directory, renders Jinja templates, copies static files, pulls images, and brings the stack up. On failure, captures container logs and fails the play.
 
@@ -44,8 +44,3 @@ This is a **role**, not a module. Invoke it with `import_role` (or `include_role
 ```
 
 `src` paths resolve against the calling role's `templates/` and `files/` directories.
-
-## Dependencies
-
-- `community.docker >= 5.2.0`
-- Docker Engine + Compose v2 plugin on the target host.

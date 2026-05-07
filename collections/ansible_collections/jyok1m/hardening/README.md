@@ -13,8 +13,8 @@ Ansible collection providing baseline Linux hardening roles.
 ## Requirements
 
 - Ansible `>= 2.20`
-- `community.general >= 12.0.0` (installed automatically)
-- Debian / Ubuntu target host with `apt`
+- Collection `community.general >= 12.0.0` (installed automatically)
+- Debian Trixie target host with `apt`
 
 ## Installation
 
@@ -49,7 +49,7 @@ See each role's `README.md` for the full variable reference.
 
 ## Testing
 
-A single Molecule scenario applies the three roles together inside a Debian 12 systemd container:
+A single Molecule scenario applies the three roles together inside a Debian 13 systemd container:
 
 ```bash
 cd extensions
