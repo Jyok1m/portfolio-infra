@@ -14,7 +14,9 @@ Installs UFW, opens a configurable allow-list of ports, and enables a deny-by-de
 ## Example
 
 ```yaml
-- role: jyok1m.hardening.firewall
+- name: Apply firewall hardening
+  ansible.builtin.import_role:
+    name: jyok1m.hardening.firewall
   vars:
     ufw_allowed_ports:
       - { port: 2222, proto: tcp, comment: SSH }

@@ -16,7 +16,9 @@ Installs fail2ban and renders a `/etc/fail2ban/jail.local` with a UFW-backed `ss
 ## Example
 
 ```yaml
-- role: jyok1m.hardening.fail2ban
+- name: Apply fail2ban hardening
+  ansible.builtin.import_role:
+    name: jyok1m.hardening.fail2ban
   vars:
     fail2ban_ssh_port: 2222
     fail2ban_ban_time: 7200

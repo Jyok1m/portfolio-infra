@@ -19,7 +19,9 @@ Renders a hardened `/etc/ssh/sshd_config` and reloads sshd safely (the template 
 ## Example
 
 ```yaml
-- role: jyok1m.hardening.ssh_hardening
+- name: Apply SSH hardening
+  ansible.builtin.import_role:
+    name: jyok1m.hardening.ssh_hardening
   vars:
     ssh_port: 2222
     ssh_allowed_users: [admin, deploy]

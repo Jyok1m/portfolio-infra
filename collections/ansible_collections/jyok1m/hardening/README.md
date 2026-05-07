@@ -24,25 +24,30 @@ ansible-galaxy collection install jyok1m.hardening
 
 ## Quick start
 
+Each role is a standalone unit — invoke it with `import_role` (or `include_role`) and pass its variables under `vars:`.
+
 ```yaml
-- hosts: all
-  become: true
-  roles:
-    - role: jyok1m.hardening.ssh_hardening
-      vars:
-        ssh_port: 2222
-        ssh_allowed_users: [admin, deploy]
+- name: Apply SSH hardening
+  ansible.builtin.import_role:
+    name: jyok1m.hardening.ssh_hardening
+  vars:
+    ssh_port: 2222
+    ssh_allowed_users: [admin, deploy]
 
-    - role: jyok1m.hardening.firewall
-      vars:
-        ufw_allowed_ports:
-          - { port: 2222, proto: tcp, comment: SSH }
-          - { port: 80, proto: tcp, comment: HTTP }
-          - { port: 443, proto: tcp, comment: HTTPS }
+- name: Apply firewall hardening
+  ansible.builtin.import_role:
+    name: jyok1m.hardening.firewall
+  vars:
+    ufw_allowed_ports:
+      - { port: 2222, proto: tcp, comment: SSH }
+      - { port: 80, proto: tcp, comment: HTTP }
+      - { port: 443, proto: tcp, comment: HTTPS }
 
-    - role: jyok1m.hardening.fail2ban
-      vars:
-        fail2ban_ssh_port: 2222
+- name: Apply fail2ban hardening
+  ansible.builtin.import_role:
+    name: jyok1m.hardening.fail2ban
+  vars:
+    fail2ban_ssh_port: 2222
 ```
 
 See each role's `README.md` for the full variable reference.
