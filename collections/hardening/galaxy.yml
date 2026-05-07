@@ -1,7 +1,7 @@
 ---
 namespace: jyok1m
 name: hardening
-version: 1.0.1
+version: 1.0.2
 readme: README.md
 authors:
   - Joachim Jasmin <joachim.jasmin-dev@proton.me>
@@ -19,9 +19,9 @@ tags:
   - ufw
 dependencies:
   community.general: ">=12.0.0"
-repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/hardening
-documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/hardening
-homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/hardening
+repository: https://github.com/Jyok1m/portfolio-infra
+documentation: https://github.com/Jyok1m/portfolio-infra
+homepage: https://github.com/Jyok1m/portfolio-infra
 issues: https://github.com/Jyok1m/portfolio-infra/issues
 build_ignore:
   - extensions/molecule

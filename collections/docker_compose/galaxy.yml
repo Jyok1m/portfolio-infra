@@ -1,7 +1,7 @@
 ---
 namespace: jyok1m
 name: docker_compose
-version: 1.1.0
+version: 1.1.1
 readme: README.md
 authors:
   - Joachim Jasmin <joachim.jasmin-dev@proton.me>
@@ -18,9 +18,9 @@ tags:
   - infrastructure
 dependencies:
   community.docker: ">=5.2.0"
-repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/docker_compose
-documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/docker_compose
-homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/docker_compose
+repository: https://github.com/Jyok1m/portfolio-infra
+documentation: https://github.com/Jyok1m/portfolio-infra
+homepage: https://github.com/Jyok1m/portfolio-infra
 issues: https://github.com/Jyok1m/portfolio-infra/issues
 build_ignore:
   - extensions/molecule
