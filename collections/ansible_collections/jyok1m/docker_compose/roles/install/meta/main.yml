@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: install
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Installs Docker Engine and the Compose v2 plugin from the official Docker apt repository.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - docker
+    - compose
+    - installation
+    - apt
+
+dependencies: []

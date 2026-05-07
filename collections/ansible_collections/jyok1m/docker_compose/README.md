@@ -1,18 +1,20 @@
 # jyok1m.docker_compose
 
-Ansible collection for idempotent Docker Compose stack deployments.
+Ansible collection for installing Docker and orchestrating idempotent Compose stack deployments on Debian Trixie.
 
 ## Contents
 
-| Role                           | Description                                                                                                                      |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `jyok1m.docker_compose.deploy` | Creates the app directory, renders templates, copies files, pulls images, and brings the stack up — with log capture on failure. |
+| Role                            | Description                                                                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `jyok1m.docker_compose.install` | Installs Docker Engine and the Compose v2 plugin from the official Docker apt repository (GPG-signed deb822 source).             |
+| `jyok1m.docker_compose.deploy`  | Creates the app directory, renders templates, copies files, pulls images, and brings the stack up — with log capture on failure. |
 
 ## Requirements
 
 - Ansible `>= 2.20`
 - Collection `community.docker >= 5.2.0` (installed automatically)
-- Docker Engine + Compose v2 plugin on target hosts
+- Debian Trixie target host with `apt` (for `install`)
+- Docker Engine + Compose v2 plugin on the target host (for `deploy` — provided by `install`)
 
 ## Installation
 

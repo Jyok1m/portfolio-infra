@@ -1,0 +1,29 @@
+---
+# APT prerequisites pulled in before the Docker repo is added
+docker_install_prerequisites:
+  - ca-certificates
+  - curl
+
+# Where the Docker GPG key lands and which key to download
+docker_install_keyring_path: /etc/apt/keyrings/docker.asc
+docker_install_signing_key_url: https://download.docker.com/linux/debian/gpg
+
+# Docker apt repository (deb822 source) configuration
+docker_install_repo_url: https://download.docker.com/linux/debian
+docker_install_repo_components: stable
+docker_install_sources_path: /etc/apt/sources.list.d/docker.sources
+
+# Packages installed from the Docker repo
+docker_install_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+
+# Service state after install
+docker_install_service_state: started
+docker_install_service_enabled: true
+
+# Optional: list of system users to add to the docker group
+docker_install_users: []

@@ -1,0 +1,56 @@
+---
+- name: Install APT prerequisites
+  ansible.builtin.apt:
+    name: "{{ docker_install_prerequisites }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: "{{ docker_install_keyring_path | dirname }}"
+    state: directory
+    mode: "0755"
+
+- name: Download the Docker GPG key
+  ansible.builtin.get_url:
+    url: "{{ docker_install_signing_key_url }}"
+    dest: "{{ docker_install_keyring_path }}"
+    mode: "0644"
+
+- name: Detect dpkg architecture
+  ansible.builtin.command: dpkg --print-architecture
+  register: _docker_install_dpkg_arch
+  changed_when: false
+  check_mode: false
+
+- name: Render the Docker apt source (deb822)
+  ansible.builtin.copy:
+    dest: "{{ docker_install_sources_path }}"
+    mode: "0644"
+    content: |
+      Types: deb
+      URIs: {{ docker_install_repo_url }}
+      Suites: {{ ansible_distribution_release }}
+      Components: {{ docker_install_repo_components }}
+      Architectures: {{ _docker_install_dpkg_arch.stdout }}
+      Signed-By: {{ docker_install_keyring_path }}
+
+- name: Install Docker engine and Compose v2 plugin
+  ansible.builtin.apt:
+    name: "{{ docker_install_packages }}"
+    state: present
+    update_cache: true
+
+- name: Ensure Docker is started and enabled
+  ansible.builtin.service:
+    name: docker
+    state: "{{ docker_install_service_state }}"
+    enabled: "{{ docker_install_service_enabled }}"
+
+- name: Add users to the docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_install_users }}"
