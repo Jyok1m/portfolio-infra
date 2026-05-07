@@ -1,12 +1,6 @@
 ---
 - name: Provision portfolio-infra on the OVH host
   hosts: ovh_host
-  pre_tasks:
-    - name: Update APT cache
-      ansible.builtin.apt:
-        update_cache: true
-        cache_valid_time: 3600
-      tags: always
   roles:
     # Initial setup
     - { role: hardening, tags: [setup, hardening] }
