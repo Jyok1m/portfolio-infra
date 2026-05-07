@@ -14,6 +14,15 @@
       - { port: "{{ ovh_portfolio_port }}", proto: tcp, comment: SSH }
       - { port: 80, proto: tcp, comment: HTTP }
       - { port: 443, proto: tcp, comment: HTTPS }
+      # Mailcow
+      - { port: 25, proto: tcp, comment: Postfix SMTP (postfix-mailcow) }
+      - { port: 465, proto: tcp, comment: Postfix SMTPS (postfix-mailcow) }
+      - { port: 587, proto: tcp, comment: Postfix Submission (postfix-mailcow) }
+      - { port: 143, proto: tcp, comment: Dovecot IMAP (dovecot-mailcow) }
+      - { port: 993, proto: tcp, comment: Dovecot IMAPS (dovecot-mailcow) }
+      - { port: 110, proto: tcp, comment: Dovecot POP3 (dovecot-mailcow) }
+      - { port: 995, proto: tcp, comment: Dovecot POP3S (dovecot-mailcow) }
+      - { port: 4190, proto: tcp, comment: Dovecot Managesieve (dovecot-mailcow) }
 
 - name: Apply fail2ban hardening
   ansible.builtin.import_role:
