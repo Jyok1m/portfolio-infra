@@ -9,7 +9,7 @@ fi
 
 COLLECTION_NAME="$1"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-COLLECTION_DIR="${REPO_ROOT}/collections/ansible_collections/jyok1m/${COLLECTION_NAME}"
+COLLECTION_DIR="${REPO_ROOT}/collections/${COLLECTION_NAME}"
 ENV_FILE="${REPO_ROOT}/.env"
 
 if [[ ! -f "${ENV_FILE}" ]]; then

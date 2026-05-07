@@ -84,8 +84,8 @@ The pre-commit hook auto-encrypts `vault.yml` before each commit if it's staged.
 Each collection ships a single Molecule scenario under `extensions/molecule/default/`. Docker must be running.
 
 ```bash
-cd collections/ansible_collections/jyok1m/hardening/extensions    && molecule test
-cd collections/ansible_collections/jyok1m/docker_compose/extensions && molecule test
+cd collections/hardening/extensions    && molecule test
+cd collections/docker_compose/extensions && molecule test
 ```
 
 `molecule test` runs the full cycle: create container → converge (apply role) → idempotence (re-apply, fail on `changed`) → verify → destroy. While iterating, prefer the short cycle that keeps the container alive between runs:

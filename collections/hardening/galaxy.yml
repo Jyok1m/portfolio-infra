@@ -19,9 +19,9 @@ tags:
   - ufw
 dependencies:
   community.general: ">=12.0.0"
-repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/hardening
-documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/hardening
-homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/hardening
+repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/hardening
+documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/hardening
+homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/hardening
 issues: https://github.com/Jyok1m/portfolio-infra/issues
 build_ignore:
   - extensions/molecule

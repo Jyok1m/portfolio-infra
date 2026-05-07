@@ -2,4 +2,4 @@
 .env
 .claude
 .venv
-collections/ansible_collections/jyok1m/*/*.tar.gz
+collections/*/*.tar.gz

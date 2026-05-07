@@ -18,9 +18,9 @@ tags:
   - infrastructure
 dependencies:
   community.docker: ">=5.2.0"
-repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
-documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
-homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/ansible_collections/jyok1m/docker_compose
+repository: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/docker_compose
+documentation: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/docker_compose
+homepage: https://github.com/Jyok1m/portfolio-infra/tree/main/collections/docker_compose
 issues: https://github.com/Jyok1m/portfolio-infra/issues
 build_ignore:
   - extensions/molecule
