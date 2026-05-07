@@ -18,5 +18,7 @@ platforms:
       - /tmp
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_DEPRECATION_WARNINGS: "False"
 verifier:
   name: ansible
