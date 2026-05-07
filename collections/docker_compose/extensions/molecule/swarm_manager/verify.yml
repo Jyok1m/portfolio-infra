@@ -1,0 +1,26 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Swarm is active
+      ansible.builtin.command:
+        argv:
+          - docker
+          - info
+          - "--format"
+          - "{% raw %}{{ .Swarm.LocalNodeState }}{% endraw %}"
+      register: swarm_state
+      changed_when: false
+      failed_when: swarm_state.stdout != 'active'
+
+    - name: Node is a manager (control plane available)
+      ansible.builtin.command:
+        argv:
+          - docker
+          - info
+          - "--format"
+          - "{% raw %}{{ .Swarm.ControlAvailable }}{% endraw %}"
+      register: control_available
+      changed_when: false
+      failed_when: control_available.stdout != 'true'

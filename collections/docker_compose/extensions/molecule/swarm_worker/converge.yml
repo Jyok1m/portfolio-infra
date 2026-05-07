@@ -1,0 +1,47 @@
+---
+- name: Install Docker on every node
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Ensure /etc/docker exists
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        mode: "0755"
+
+    - name: Configure inner Docker daemon for DinD (vfs storage avoids overlay-on-overlay)
+      ansible.builtin.copy:
+        content: |
+          {
+            "storage-driver": "vfs",
+            "features": {
+              "containerd-snapshotter": false
+            }
+          }
+        dest: /etc/docker/daemon.json
+        mode: "0644"
+  tasks:
+    - name: Install Docker via the install role
+      ansible.builtin.import_role:
+        name: jyok1m.docker_compose.install
+
+- name: Initialize the swarm on the manager
+  hosts: swarm_managers
+  become: true
+  tasks:
+    - name: Bring up the swarm via the manager role
+      ansible.builtin.import_role:
+        name: jyok1m.docker_compose.swarm_manager
+      vars:
+        swarm_manager_advertise_addr: "{{ ansible_default_ipv4.address }}"
+
+- name: Join workers to the swarm
+  hosts: swarm_workers
+  become: true
+  tasks:
+    - name: Join the swarm via the worker role
+      ansible.builtin.import_role:
+        name: jyok1m.docker_compose.swarm_worker
+      vars:
+        swarm_worker_token: "{{ hostvars[groups['swarm_managers'][0]].swarm_worker_token }}"
+        swarm_worker_manager_addr: "{{ hostvars[groups['swarm_managers'][0]].ansible_default_ipv4.address }}:2377"

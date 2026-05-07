@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: swarm_worker
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Joins a host to an existing Docker Swarm as a worker node.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - docker
+    - swarm
+    - worker
+
+dependencies: []

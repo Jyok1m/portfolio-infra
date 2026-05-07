@@ -1,0 +1,36 @@
+---
+- name: Verify the worker is in the swarm
+  hosts: swarm_workers
+  become: true
+  tasks:
+    - name: Swarm is active on the worker
+      ansible.builtin.command:
+        argv:
+          - docker
+          - info
+          - "--format"
+          - "{% raw %}{{ .Swarm.LocalNodeState }}{% endraw %}"
+      register: worker_state
+      changed_when: false
+      failed_when: worker_state.stdout != 'active'
+
+- name: Verify the worker is registered on the manager
+  hosts: swarm_managers
+  become: true
+  tasks:
+    - name: List swarm node hostnames
+      ansible.builtin.command:
+        argv:
+          - docker
+          - node
+          - ls
+          - "--format"
+          - "{% raw %}{{ .Hostname }}{% endraw %}"
+      register: nodes
+      changed_when: false
+
+    - name: Worker hostname appears in the swarm
+      ansible.builtin.assert:
+        that:
+          - "'swarm-test-worker' in nodes.stdout"
+        fail_msg: "Worker not registered. docker node ls output:\n{{ nodes.stdout }}"

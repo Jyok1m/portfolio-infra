@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: swarm_manager
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Initializes a Docker Swarm cluster on the first manager node and exposes the join tokens as host facts.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - docker
+    - swarm
+    - manager
+
+dependencies: []

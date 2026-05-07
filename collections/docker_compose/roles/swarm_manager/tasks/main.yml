@@ -1,0 +1,70 @@
+---
+- name: Ensure python3, pip and venv are installed
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Read current swarm state
+  ansible.builtin.command:
+    argv:
+      - docker
+      - info
+      - "--format"
+      - "{% raw %}{{ .Swarm.LocalNodeState }}{% endraw %}"
+  register: _swarm_manager_state
+  changed_when: false
+  check_mode: false
+
+- name: Initialize the swarm (skipped if this node is already a manager)
+  ansible.builtin.command: >-
+    docker swarm init
+    {{ ('--advertise-addr=' ~ swarm_manager_advertise_addr) if swarm_manager_advertise_addr | length > 0 else '' }}
+    {{ ('--listen-addr=' ~ swarm_manager_listen_addr) if swarm_manager_listen_addr | length > 0 else '' }}
+    {{ swarm_manager_default_addr_pool | map('regex_replace', '^', '--default-addr-pool=') | join(' ') }}
+  when: _swarm_manager_state.stdout != 'active'
+  changed_when: true
+
+- name: Read the swarm worker join token
+  ansible.builtin.command: docker swarm join-token -q worker
+  register: _swarm_manager_worker_token
+  changed_when: false
+
+- name: Read the swarm manager join token
+  ansible.builtin.command: docker swarm join-token -q manager
+  register: _swarm_manager_manager_token
+  changed_when: false
+
+- name: Read the swarm advertise address
+  ansible.builtin.command:
+    argv:
+      - docker
+      - info
+      - "--format"
+      - "{% raw %}{{ (index .Swarm.RemoteManagers 0).Addr }}{% endraw %}"
+  register: _swarm_manager_addr
+  changed_when: false
+
+- name: Expose swarm tokens and address as host facts
+  ansible.builtin.set_fact:
+    swarm_worker_token: "{{ _swarm_manager_worker_token.stdout }}"
+    swarm_manager_token: "{{ _swarm_manager_manager_token.stdout }}"
+    swarm_manager_addr: "{{ _swarm_manager_addr.stdout }}"
+
+- name: Show the swarm join tokens (store these in your vault)
+  ansible.builtin.debug:
+    msg:
+      - "============================================================"
+      - "Docker Swarm join tokens — store these in your vault:"
+      - ""
+      - "    swarm_worker_token:  {{ swarm_worker_token }}"
+      - "    swarm_manager_token: {{ swarm_manager_token }}"
+      - "    swarm_manager_addr:  {{ swarm_manager_addr }}"
+      - ""
+      - "Set swarm_manager_show_tokens: false to silence this message."
+      - "============================================================"
+  when: swarm_manager_show_tokens

@@ -1,0 +1,30 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Ensure /etc/docker exists
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        mode: "0755"
+
+    - name: Configure inner Docker daemon for DinD (vfs storage avoids overlay-on-overlay)
+      ansible.builtin.copy:
+        content: |
+          {
+            "storage-driver": "vfs",
+            "features": {
+              "containerd-snapshotter": false
+            }
+          }
+        dest: /etc/docker/daemon.json
+        mode: "0644"
+
+    - name: Install Docker via the install role
+      ansible.builtin.import_role:
+        name: jyok1m.docker_compose.install
+  tasks:
+    - name: Initialize the swarm via the manager role
+      ansible.builtin.import_role:
+        name: jyok1m.docker_compose.swarm_manager

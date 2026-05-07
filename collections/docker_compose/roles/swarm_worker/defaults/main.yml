@@ -1,0 +1,12 @@
+---
+# Worker join token issued by `docker swarm join-token -q worker` on the
+# manager. Required.
+swarm_worker_token: ""
+
+# Address of the swarm manager, format `host:port` (e.g. 10.0.0.1:2377).
+# Required.
+swarm_worker_manager_addr: ""
+
+# Optional address advertised to other nodes (defaults to the routable
+# interface picked by docker).
+swarm_worker_advertise_addr: ""

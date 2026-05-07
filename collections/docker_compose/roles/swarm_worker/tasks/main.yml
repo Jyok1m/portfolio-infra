@@ -1,0 +1,38 @@
+---
+- name: Ensure python3, pip and venv are installed
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Validate worker inputs
+  ansible.builtin.assert:
+    that:
+      - swarm_worker_token | length > 0
+      - swarm_worker_manager_addr | length > 0
+    fail_msg: "swarm_worker_token and swarm_worker_manager_addr must both be set."
+    quiet: true
+
+- name: Read current swarm state
+  ansible.builtin.command:
+    argv:
+      - docker
+      - info
+      - "--format"
+      - "{% raw %}{{ .Swarm.LocalNodeState }}{% endraw %}"
+  register: _swarm_worker_state
+  changed_when: false
+  check_mode: false
+
+- name: Join the swarm as a worker (skipped if this node is already in a swarm)
+  ansible.builtin.command:
+    argv: "{{ ['docker', 'swarm', 'join', '--token', swarm_worker_token]
+              + (['--advertise-addr=' ~ swarm_worker_advertise_addr] if swarm_worker_advertise_addr | length > 0 else [])
+              + [swarm_worker_manager_addr] }}"
+  when: _swarm_worker_state.stdout != 'active'
+  changed_when: true
+  no_log: true

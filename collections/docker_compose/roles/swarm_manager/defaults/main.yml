@@ -1,0 +1,16 @@
+---
+# Address advertised to other nodes for API access. Empty → docker picks the
+# default routable interface. Set to an IP/hostname (e.g. the LAN address) when
+# you have multiple NICs.
+swarm_manager_advertise_addr: ""
+
+# Listen address for inbound swarm manager traffic (default 0.0.0.0:2377).
+swarm_manager_listen_addr: ""
+
+# Optional default address pool(s) for the swarm overlay networks (e.g.
+# ["10.20.0.0/16"]). Empty → docker default (10.0.0.0/8).
+swarm_manager_default_addr_pool: []
+
+# When true, the role prints the worker/manager join tokens via `debug` so you
+# can copy them into your vault. Set to false once vaulted.
+swarm_manager_show_tokens: true
