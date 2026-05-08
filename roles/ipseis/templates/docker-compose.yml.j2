@@ -64,13 +64,13 @@ services:
       - BACKEND_USERNAME={{ ipseis_db_root_user }}
       - BACKEND_PASSWORD={{ ipseis_db_root_password }}
     volumes:
-      - "{{ app_base_path }}/ipseis/uploads:/app/public/uploads"
+      - "{{ app_path }}/uploads:/app/public/uploads"
     networks:
       - ipseis-internal
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.joachimjasmin.com`) || Host(`ipseis-backend.joachimjasmin.fr`)
+      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.{{ base_domain }}`) || Host(`ipseis-backend.{{ base_domain_fr }}`)
       - traefik.http.routers.ipseis-api.entrypoints=websecure
       - traefik.http.routers.ipseis-api.tls.certresolver=letsencrypt
       - traefik.http.services.ipseis-api.loadbalancer.server.port=3000

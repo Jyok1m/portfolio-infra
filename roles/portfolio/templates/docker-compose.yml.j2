@@ -14,7 +14,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.portfolio.rule=Host(`joachimjasmin.com`) || Host(`joachimjasmin.fr`)
+      - traefik.http.routers.portfolio.rule=Host(`{{ base_domain }}`) || Host(`{{ base_domain_fr }}`)
       - traefik.http.routers.portfolio.entrypoints=websecure
       - traefik.http.routers.portfolio.tls.certresolver=letsencrypt
       - traefik.http.services.portfolio.loadbalancer.server.port=3000

@@ -34,7 +34,7 @@ services:
         max-file: "5"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - "{{ data_base_path }}/traefik/acme.json:/acme.json"
+      - "{{ data_path }}/acme.json:/acme.json"
     ports:
       - 80:80/tcp
       - 443:443/tcp

@@ -48,7 +48,7 @@ services:
       DOCKER_CERT_PATH: /certs/client
       DOCKER_TLS_VERIFY: 1
       JENKINS_OPTS: --httpPort=8080
-      JENKINS_URL: https://jenkins.joachimjasmin.com/
+      JENKINS_URL: https://jenkins.{{ base_domain }}/
       JAVA_OPTS: -Djenkins.model.Jenkins.crumbIssuerProxyCompatibility=true -Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true
     volumes:
       - jenkins:/var/jenkins_home
@@ -58,7 +58,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jenkins.rule=Host(`jenkins.joachimjasmin.com`) || Host(`jenkins.joachimjasmin.fr`) 
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.{{ base_domain }}`) || Host(`jenkins.{{ base_domain_fr }}`) 
       - traefik.http.routers.jenkins.entrypoints=websecure
       - traefik.http.routers.jenkins.tls.certresolver=letsencrypt
       - traefik.http.services.jenkins.loadbalancer.server.port=8080

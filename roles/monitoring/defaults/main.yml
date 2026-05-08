@@ -1,6 +1,6 @@
 ---
 app_name: monitoring
-app_base_path: /opt/{{ app_name }}
+app_path: /opt/{{ app_name }}
 
 prometheus_image_name: prom/prometheus
 prometheus_image_tag: v3.7.3
