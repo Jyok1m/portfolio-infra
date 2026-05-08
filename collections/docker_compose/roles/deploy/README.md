@@ -12,16 +12,16 @@ Deploys a Docker Compose stack: provisions the target directory, renders Jinja t
 
 ### Optional
 
-| Variable                        | Default                                                                | Description                                                |
-| ------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `docker_compose_app_path`       | `{{ app_base_path \| default('/opt') }}/{{ docker_compose_app_name }}` | Deployment path on the target host.                        |
-| `docker_compose_dir_mode`       | `"0755"`                                                               | Directory permissions.                                     |
-| `docker_compose_templates`      | `[]`                                                                   | List of `{src, dest, mode?, no_log?}` rendered with Jinja. |
-| `docker_compose_files`          | `[]`                                                                   | List of `{src, dest, mode?}` copied as-is.                 |
-| `docker_compose_pull`           | `true`                                                                 | Pull images before bringing the stack up.                  |
-| `docker_compose_remove_orphans` | `true`                                                                 | Remove orphan containers.                                  |
-| `docker_compose_wait_timeout`   | `120`                                                                  | Healthcheck wait timeout in seconds.                       |
-| `docker_compose_logs_tail`      | `100`                                                                  | Number of log lines captured on failure.                   |
+| Variable                        | Default                                                           | Description                                                |
+| ------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------- |
+| `docker_compose_app_path`       | `{{ app_path \| default('/opt') }}/{{ docker_compose_app_name }}` | Deployment path on the target host.                        |
+| `docker_compose_dir_mode`       | `"0755"`                                                          | Directory permissions.                                     |
+| `docker_compose_templates`      | `[]`                                                              | List of `{src, dest, mode?, no_log?}` rendered with Jinja. |
+| `docker_compose_files`          | `[]`                                                              | List of `{src, dest, mode?}` copied as-is.                 |
+| `docker_compose_pull`           | `true`                                                            | Pull images before bringing the stack up.                  |
+| `docker_compose_remove_orphans` | `true`                                                            | Remove orphan containers.                                  |
+| `docker_compose_wait_timeout`   | `120`                                                             | Healthcheck wait timeout in seconds.                       |
+| `docker_compose_logs_tail`      | `100`                                                             | Number of log lines captured on failure.                   |
 
 ## Example
 

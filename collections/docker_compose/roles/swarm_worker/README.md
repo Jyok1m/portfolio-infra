@@ -32,6 +32,6 @@ Joins a host to an existing Docker Swarm as a **worker**. Uses `community.docker
     - ansible.builtin.import_role:
         name: jyok1m.docker_compose.swarm_worker
       vars:
-        swarm_worker_token: "{{ vault_swarm_worker_token }}"
+        swarm_worker_token: "{{ swarm_worker_token }}"
         swarm_worker_manager_addr: "manager.example.com:2377"
 ```

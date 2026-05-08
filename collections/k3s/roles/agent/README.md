@@ -26,6 +26,6 @@ Installs and configures a k3s **agent** (worker) node on Debian Trixie and joins
   vars:
     k3s_version: v1.31.4+k3s1
     k3s_agent_server_url: "https://{{ hostvars[groups['k3s_servers'][0]].ansible_host }}:6443"
-    k3s_agent_token: "{{ vault_k3s_token }}"
+    k3s_agent_token: "{{ k3s_token }}"
     k3s_agent_exec_args: "--node-label workload=app"
 ```

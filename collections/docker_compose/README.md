@@ -4,12 +4,12 @@ Ansible collection for installing Docker and orchestrating idempotent Compose st
 
 ## Contents
 
-| Role                                   | Description                                                                                                                      |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `jyok1m.docker_compose.install`        | Installs Docker Engine and the Compose v2 plugin from the official Docker apt repository (GPG-signed deb822 source).             |
-| `jyok1m.docker_compose.deploy`         | Creates the app directory, renders templates, copies files, pulls images, and brings the stack up — with log capture on failure. |
-| `jyok1m.docker_compose.swarm_manager`  | Initializes a Docker Swarm cluster on the first manager node and exposes the worker/manager join tokens as host facts.           |
-| `jyok1m.docker_compose.swarm_worker`   | Joins a host to an existing Docker Swarm as a worker node (idempotent via `community.docker.docker_swarm`).                      |
+| Role                                  | Description                                                                                                                      |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `jyok1m.docker_compose.install`       | Installs Docker Engine and the Compose v2 plugin from the official Docker apt repository (GPG-signed deb822 source).             |
+| `jyok1m.docker_compose.deploy`        | Creates the app directory, renders templates, copies files, pulls images, and brings the stack up — with log capture on failure. |
+| `jyok1m.docker_compose.swarm_manager` | Initializes a Docker Swarm cluster on the first manager node and exposes the worker/manager join tokens as host facts.           |
+| `jyok1m.docker_compose.swarm_worker`  | Joins a host to an existing Docker Swarm as a worker node (idempotent via `community.docker.docker_swarm`).                      |
 
 ## Requirements
 
@@ -94,7 +94,7 @@ The worker play picks the token straight from the fact set by the manager play i
     - ansible.builtin.import_role:
         name: jyok1m.docker_compose.swarm_worker
       vars:
-        swarm_worker_token: "{{ vault_swarm_worker_token }}"
+        swarm_worker_token: "{{ swarm_worker_token }}"
         swarm_worker_manager_addr: "manager.example.com:2377"
 ```
 
@@ -102,11 +102,11 @@ The worker play picks the token straight from the fact set by the manager play i
 
 Three Molecule scenarios live under `extensions/molecule/`:
 
-| Scenario        | What it covers                                                                |
-| --------------- | ----------------------------------------------------------------------------- |
+| Scenario        | What it covers                                                                 |
+| --------------- | ------------------------------------------------------------------------------ |
 | `default`       | `install` + `deploy` against a tiny alpine stack inside a Debian 13 container. |
-| `swarm_manager` | `install` + `swarm_manager` (single-node swarm init).                         |
-| `swarm_worker`  | `install` + `swarm_manager` + `swarm_worker` across two networked containers. |
+| `swarm_manager` | `install` + `swarm_manager` (single-node swarm init).                          |
+| `swarm_worker`  | `install` + `swarm_manager` + `swarm_worker` across two networked containers.  |
 
 ```bash
 cd extensions

@@ -4,22 +4,22 @@ Installs Docker Engine and the Compose v2 plugin from the official Docker apt re
 
 ## Variables
 
-| Variable                          | Default                                                                          | Description                                          |
-| --------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `docker_install_prerequisites`    | `[ca-certificates, curl]`                                                        | Packages installed before adding the Docker repo.    |
-| `docker_install_keyring_path`     | `/etc/apt/keyrings/docker.asc`                                                   | Where the Docker GPG key is stored.                  |
-| `docker_install_signing_key_url`  | `https://download.docker.com/linux/debian/gpg`                                   | URL of the Docker GPG signing key.                   |
-| `docker_install_repo_url`         | `https://download.docker.com/linux/debian`                                       | Docker apt repository base URL.                      |
-| `docker_install_repo_components`  | `stable`                                                                         | Repo components.                                     |
-| `docker_install_sources_path`     | `/etc/apt/sources.list.d/docker.sources`                                         | Path of the deb822 source file.                      |
-| `docker_install_packages`         | `[docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin]` | Packages installed from the Docker repo.    |
-| `docker_install_service_state`    | `started`                                                                        | Final state of the `docker` service.                 |
-| `docker_install_service_enabled`  | `true`                                                                           | Whether `docker` is enabled at boot.                 |
-| `docker_install_users`            | `[]`                                                                             | List of users to add to the `docker` group.          |
-| `docker_install_login`            | `false`                                                                          | Whether to log in to a Docker registry after install. |
-| `docker_install_registry_url`     | `https://index.docker.io/v1/`                                                    | Registry URL (Docker Hub by default).                |
-| `docker_install_username`         | `""`                                                                             | Registry username (required when `docker_install_login: true`). |
-| `docker_install_password`         | `""`                                                                             | Registry password or token (required when `docker_install_login: true`). |
+| Variable                         | Default                                                                                  | Description                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `docker_install_prerequisites`   | `[ca-certificates, curl]`                                                                | Packages installed before adding the Docker repo.                        |
+| `docker_install_keyring_path`    | `/etc/apt/keyrings/docker.asc`                                                           | Where the Docker GPG key is stored.                                      |
+| `docker_install_signing_key_url` | `https://download.docker.com/linux/debian/gpg`                                           | URL of the Docker GPG signing key.                                       |
+| `docker_install_repo_url`        | `https://download.docker.com/linux/debian`                                               | Docker apt repository base URL.                                          |
+| `docker_install_repo_components` | `stable`                                                                                 | Repo components.                                                         |
+| `docker_install_sources_path`    | `/etc/apt/sources.list.d/docker.sources`                                                 | Path of the deb822 source file.                                          |
+| `docker_install_packages`        | `[docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin]` | Packages installed from the Docker repo.                                 |
+| `docker_install_service_state`   | `started`                                                                                | Final state of the `docker` service.                                     |
+| `docker_install_service_enabled` | `true`                                                                                   | Whether `docker` is enabled at boot.                                     |
+| `docker_install_users`           | `[]`                                                                                     | List of users to add to the `docker` group.                              |
+| `docker_install_login`           | `false`                                                                                  | Whether to log in to a Docker registry after install.                    |
+| `docker_install_registry_url`    | `https://index.docker.io/v1/`                                                            | Registry URL (Docker Hub by default).                                    |
+| `docker_install_username`        | `""`                                                                                     | Registry username (required when `docker_install_login: true`).          |
+| `docker_install_password`        | `""`                                                                                     | Registry password or token (required when `docker_install_login: true`). |
 
 ## Example
 
@@ -42,6 +42,6 @@ With Docker Hub login (credentials from your vault):
   vars:
     docker_install_users: [deploy]
     docker_install_login: true
-    docker_install_username: "{{ vault_docker_username }}"
-    docker_install_password: "{{ vault_docker_token }}"
+    docker_install_username: "{{ docker_username }}"
+    docker_install_password: "{{ docker_token }}"
 ```

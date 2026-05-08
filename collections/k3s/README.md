@@ -81,7 +81,7 @@ The agent play picks the token straight from the fact set by the server play in 
         name: jyok1m.k3s.agent
       vars:
         k3s_agent_server_url: "https://master.example.com:6443"
-        k3s_agent_token: "{{ vault_k3s_token }}"
+        k3s_agent_token: "{{ k3s_token }}"
 ```
 
 The server isn't part of this run, so the token has to come from somewhere — typically your vault, populated once from the debug output the server role printed on first install (see `roles/server/README.md`).

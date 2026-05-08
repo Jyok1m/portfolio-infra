@@ -1,7 +1,7 @@
 ---
 namespace: jyok1m
 name: docker_compose
-version: 2.0.0
+version: 2.0.1
 readme: README.md
 authors:
   - Joachim Jasmin <joachim.jasmin-dev@proton.me>

@@ -3,7 +3,7 @@
 docker_compose_app_name: ""
 
 # Paths
-docker_compose_app_path: "{{ app_base_path | default('/opt') }}/{{ docker_compose_app_name }}"
+docker_compose_app_path: "{{ app_path | default('/opt') }}/{{ docker_compose_app_name }}"
 docker_compose_dir_mode: "0755"
 
 # Jinja templates (resolved against the calling role)

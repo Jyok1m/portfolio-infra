@@ -1,7 +1,7 @@
 ---
 namespace: jyok1m
 name: k3s
-version: 1.0.0
+version: 1.0.1
 readme: README.md
 authors:
   - Joachim Jasmin <joachim.jasmin-dev@proton.me>
