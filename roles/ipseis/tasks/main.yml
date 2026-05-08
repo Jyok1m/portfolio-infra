@@ -9,3 +9,32 @@
       - src: docker-compose.yml.j2
         dest: docker-compose.yml
         no_log: true
+
+- name: Schedule {{ app_name }}-db dumps
+  ansible.builtin.import_role:
+    name: jyok1m.backups.mongo_dump
+  vars:
+    mongo_dump_name: "{{ app_name }}"
+    mongo_dump_container: "{{ app_name }}-db"
+    mongo_dump_network: "{{ app_name }}-internal"
+    mongo_dump_username: "{{ ipseis_db_root_user }}"
+    mongo_dump_password: "{{ ipseis_db_root_password }}"
+    mongo_dump_restic_repo: "s3:https://s3.gra.io.cloud.ovh.net/{{ app_name }}"
+    mongo_dump_restic_password: "{{ restic_password }}"
+    mongo_dump_restic_env:
+      AWS_ACCESS_KEY_ID: "{{ s3_access_key_portfolio }}"
+      AWS_SECRET_ACCESS_KEY: "{{ s3_secret_key_portfolio }}"
+    mongo_dump_on_calendar: "*-*-* 03:00:00"
+
+- name: Install {{ app_name }} restore tooling
+  ansible.builtin.import_role:
+    name: jyok1m.backups.mongo_restore
+  vars:
+    mongo_restore_name: "{{ app_name }}"
+    mongo_restore_username: "{{ ipseis_db_root_user }}"
+    mongo_restore_password: "{{ ipseis_db_root_password }}"
+    mongo_restore_restic_repo: "s3:https://s3.gra.io.cloud.ovh.net/{{ app_name }}"
+    mongo_restore_restic_password: "{{ restic_password }}"
+    mongo_restore_restic_env:
+      AWS_ACCESS_KEY_ID: "{{ s3_access_key_portfolio }}"
+      AWS_SECRET_ACCESS_KEY: "{{ s3_secret_key_portfolio }}"
