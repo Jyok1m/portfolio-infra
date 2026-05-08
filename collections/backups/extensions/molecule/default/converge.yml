@@ -1,0 +1,113 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    test_name: smoke
+    test_network: smoke-internal
+    test_mongo_user: root
+    test_mongo_password: testpass
+    test_restic_repo: /var/cache/restic-test-repo
+    test_restic_password: restic-testpass
+  pre_tasks:
+    - name: Ensure /etc/docker exists
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        mode: "0755"
+
+    - name: Configure inner Docker daemon for DinD (vfs storage avoids overlay-on-overlay)
+      ansible.builtin.copy:
+        content: |
+          {
+            "storage-driver": "vfs",
+            "features": {
+              "containerd-snapshotter": false
+            }
+          }
+        dest: /etc/docker/daemon.json
+        mode: "0644"
+
+    - name: Install Docker via the docker_compose collection
+      ansible.builtin.import_role:
+        name: jyok1m.docker_compose.install
+
+    - name: Install python docker SDK for community.docker modules
+      ansible.builtin.apt:
+        name: python3-docker
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Pull mongo:8.2.5 image (used by both the test DB and the dump runner)
+      community.docker.docker_image_pull:
+        name: mongo:8.2.5
+
+    - name: Create the test docker network
+      community.docker.docker_network:
+        name: "{{ test_network }}"
+        driver: bridge
+        internal: true
+
+    - name: Run the test Mongo container
+      community.docker.docker_container:
+        name: "{{ test_name }}-db"
+        image: mongo:8.2.5
+        state: started
+        restart_policy: "no"
+        networks:
+          - name: "{{ test_network }}"
+        env:
+          MONGO_INITDB_ROOT_USERNAME: "{{ test_mongo_user }}"
+          MONGO_INITDB_ROOT_PASSWORD: "{{ test_mongo_password }}"
+        healthcheck:
+          test:
+            - CMD
+            - mongosh
+            - --quiet
+            - -u
+            - "{{ test_mongo_user }}"
+            - -p
+            - "{{ test_mongo_password }}"
+            - --authenticationDatabase
+            - admin
+            - --eval
+            - "db.runCommand('ping').ok"
+          interval: 5s
+          timeout: 5s
+          retries: 12
+          start_period: 20s
+
+    - name: Wait for Mongo to become healthy
+      ansible.builtin.command: docker inspect --format '{% raw %}{{.State.Health.Status}}{% endraw %}' "{{ test_name }}-db"
+      register: mongo_health
+      until: mongo_health.stdout == "healthy"
+      retries: 30
+      delay: 5
+      changed_when: false
+
+  tasks:
+    - name: Apply mongo_dump role
+      ansible.builtin.import_role:
+        name: jyok1m.backups.mongo_dump
+      vars:
+        mongo_dump_name: "{{ test_name }}"
+        mongo_dump_network: "{{ test_network }}"
+        mongo_dump_username: "{{ test_mongo_user }}"
+        mongo_dump_password: "{{ test_mongo_password }}"
+        mongo_dump_restic_repo: "{{ test_restic_repo }}"
+        mongo_dump_restic_password: "{{ test_restic_password }}"
+        # The molecule container has no real schedule — disable so runs are explicit.
+        mongo_dump_timer_state: stopped
+        mongo_dump_timer_enabled: false
+
+    - name: Apply mongo_restore role
+      ansible.builtin.import_role:
+        name: jyok1m.backups.mongo_restore
+      vars:
+        mongo_restore_name: "{{ test_name }}"
+        mongo_restore_network: "{{ test_network }}"
+        mongo_restore_username: "{{ test_mongo_user }}"
+        mongo_restore_password: "{{ test_mongo_password }}"
+        mongo_restore_restic_repo: "{{ test_restic_repo }}"
+        mongo_restore_restic_password: "{{ test_restic_password }}"

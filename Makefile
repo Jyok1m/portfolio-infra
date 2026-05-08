@@ -39,6 +39,7 @@ help:
 	@echo "	publish-collection-docker_compose	Build and publish jyok1m.docker_compose to Ansible Galaxy"
 	@echo "	publish-collection-hardening		Build and publish jyok1m.hardening to Ansible Galaxy"
 	@echo "	publish-collection-k3s			Build and publish jyok1m.k3s to Ansible Galaxy"
+	@echo "	publish-collection-backups			Build and publish jyok1m.backups to Ansible Galaxy"
 	@echo ""
 	@echo "Molecule:"
 	@echo "	molecule-test TAGS=<name>		Run molecule test on collections/<name> (all scenarios)"
@@ -126,3 +127,6 @@ publish-collection-hardening:
 
 publish-collection-k3s:
 	./scripts/publish-collection.sh k3s
+
+publish-collection-backups:
+	./scripts/publish-collection.sh backups

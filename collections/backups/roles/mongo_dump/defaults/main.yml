@@ -1,0 +1,50 @@
+---
+# Required: identifier used in unit/script/env file names. Must be a-z0-9_-.
+mongo_dump_name: ""
+
+# Mongo target — defaults assume the container shares a docker network with the dump runner
+mongo_dump_container: "{{ mongo_dump_name }}-db"
+mongo_dump_network: "{{ mongo_dump_name }}-internal"
+mongo_dump_image: "mongo:8.2.5"
+mongo_dump_port: 27017
+
+# Mongo credentials — required
+mongo_dump_username: ""
+mongo_dump_password: ""
+mongo_dump_authdb: "admin"
+
+# Optional: limit the dump to a single database (empty = dump everything)
+mongo_dump_db: ""
+
+# Local staging directory (created if missing, root-only)
+mongo_dump_local_dir: "/var/backups/mongo/{{ mongo_dump_name }}"
+mongo_dump_local_keep: 2 # number of recent local archives kept after a successful push
+
+# Restic repository — required
+mongo_dump_restic_repo: ""
+mongo_dump_restic_password: ""
+
+# Backend-specific env vars passed to restic (e.g. B2_ACCOUNT_ID, AWS_ACCESS_KEY_ID, …).
+# Shape: { KEY: value }
+mongo_dump_restic_env: {}
+
+# Whether to run `restic init` if the repository is empty (idempotent)
+mongo_dump_restic_init: true
+
+# Retention policy applied after every successful push
+mongo_dump_keep_daily: 7
+mongo_dump_keep_weekly: 4
+mongo_dump_keep_monthly: 12
+
+# systemd schedule (see `man systemd.time` for OnCalendar syntax)
+mongo_dump_on_calendar: "daily"
+mongo_dump_randomized_delay: "30min"
+mongo_dump_persistent: true # catch up on missed runs after downtime
+
+# Host packages installed by the role
+mongo_dump_packages:
+  - restic
+
+# Final state of the timer
+mongo_dump_timer_state: started
+mongo_dump_timer_enabled: true

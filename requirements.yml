@@ -12,5 +12,7 @@ collections:
     version: "==1.0.2"
   - name: jyok1m.k3s
     version: "==1.0.1"
+  - name: jyok1m.backups
+    version: "==1.0.0"
   # - source: ./collections/k3s
   #   type: dir

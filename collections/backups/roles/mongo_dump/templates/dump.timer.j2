@@ -1,0 +1,11 @@
+[Unit]
+Description=Schedule for Mongo dump + restic push ({{ mongo_dump_name }})
+
+[Timer]
+OnCalendar={{ mongo_dump_on_calendar }}
+RandomizedDelaySec={{ mongo_dump_randomized_delay }}
+Persistent={{ 'true' if mongo_dump_persistent else 'false' }}
+Unit=mongo-dump-{{ mongo_dump_name }}.service
+
+[Install]
+WantedBy=timers.target

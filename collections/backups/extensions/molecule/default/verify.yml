@@ -1,0 +1,105 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  vars:
+    test_name: smoke
+    test_mongo_user: root
+    test_mongo_password: testpass
+    sentinel_db: canary
+    sentinel_value: round-trip
+    mongosh_auth_args:
+      - mongosh
+      - --quiet
+      - -u
+      - "{{ test_mongo_user }}"
+      - -p
+      - "{{ test_mongo_password }}"
+      - --authenticationDatabase
+      - admin
+  tasks:
+    - name: Check that the dump script is in place
+      ansible.builtin.stat:
+        path: "/usr/local/bin/mongo-dump-{{ test_name }}.sh"
+      register: dump_script
+      failed_when: not dump_script.stat.exists or dump_script.stat.mode != '0750'
+
+    - name: Check that the restore script is in place
+      ansible.builtin.stat:
+        path: "/usr/local/bin/mongo-restore-{{ test_name }}.sh"
+      register: restore_script
+      failed_when: not restore_script.stat.exists or restore_script.stat.mode != '0750'
+
+    - name: Check that the dump env file is locked down
+      ansible.builtin.stat:
+        path: "/etc/mongo-dump-{{ test_name }}.env"
+      register: dump_env
+      failed_when: not dump_env.stat.exists or dump_env.stat.mode != '0600'
+
+    - name: Check that the systemd timer unit exists
+      ansible.builtin.stat:
+        path: "/etc/systemd/system/mongo-dump-{{ test_name }}.timer"
+      register: dump_timer
+      failed_when: not dump_timer.stat.exists
+
+    - name: Insert a sentinel document into Mongo
+      community.docker.docker_container_exec:
+        container: "{{ test_name }}-db"
+        argv: >-
+          {{ mongosh_auth_args + [sentinel_db, '--eval',
+             'db.canary.insertOne({sig: "' ~ sentinel_value ~ '"})'] }}
+      changed_when: true
+
+    - name: Trigger the dump service
+      ansible.builtin.systemd_service:
+        name: "mongo-dump-{{ test_name }}.service"
+        state: started
+
+    - name: Wait for the dump service to finish
+      ansible.builtin.command: "systemctl is-active mongo-dump-{{ test_name }}.service"
+      register: dump_active
+      until: dump_active.stdout != "activating"
+      retries: 60
+      delay: 2
+      changed_when: false
+      failed_when: dump_active.stdout not in ['inactive', 'active']
+
+    - name: Verify the dump exit status
+      ansible.builtin.command: "systemctl show -p Result --value mongo-dump-{{ test_name }}.service"
+      register: dump_result
+      changed_when: false
+      failed_when: dump_result.stdout != "success"
+
+    - name: Drop the sentinel database
+      community.docker.docker_container_exec:
+        container: "{{ test_name }}-db"
+        argv: >-
+          {{ mongosh_auth_args + [sentinel_db, '--eval', 'db.dropDatabase()'] }}
+      changed_when: true
+
+    - name: Confirm the sentinel database is gone
+      community.docker.docker_container_exec:
+        container: "{{ test_name }}-db"
+        argv: >-
+          {{ mongosh_auth_args + [sentinel_db, '--eval', 'db.canary.countDocuments({})'] }}
+      register: pre_restore_count
+      changed_when: false
+      failed_when: "'0' not in pre_restore_count.stdout"
+
+    - name: Restore the latest snapshot non-interactively
+      ansible.builtin.command:
+        argv:
+          - "/usr/local/bin/mongo-restore-{{ test_name }}.sh"
+          - latest
+          - --yes
+      changed_when: true
+
+    - name: Read back the sentinel
+      community.docker.docker_container_exec:
+        container: "{{ test_name }}-db"
+        argv: >-
+          {{ mongosh_auth_args + [sentinel_db, '--eval',
+             'JSON.stringify(db.canary.findOne({sig: "' ~ sentinel_value ~ '"}))'] }}
+      register: sentinel_after
+      changed_when: false
+      failed_when: sentinel_value not in sentinel_after.stdout

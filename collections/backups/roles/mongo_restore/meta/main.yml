@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: mongo_restore
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Installs a restore script that fetches a restic snapshot and pipes it into mongorestore. Manual invocation only.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - restore
+    - mongodb
+    - restic
+
+dependencies: []

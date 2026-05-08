@@ -1,0 +1,29 @@
+---
+# Required: identifier — must match the mongo_dump_name used to produce the snapshots
+mongo_restore_name: ""
+
+# Mongo target — the container that will receive the restore
+mongo_restore_container: "{{ mongo_restore_name }}-db"
+mongo_restore_network: "{{ mongo_restore_name }}-internal"
+mongo_restore_image: "mongo:8.2.5"
+mongo_restore_port: 27017
+
+# Mongo credentials — required
+mongo_restore_username: ""
+mongo_restore_password: ""
+mongo_restore_authdb: "admin"
+
+# Optional: limit the restore to a single database (must match a dump scope)
+mongo_restore_db: ""
+
+# Local working directory used to materialize a snapshot before mongorestore
+mongo_restore_local_dir: "/var/backups/mongo/{{ mongo_restore_name }}/restore"
+
+# Restic repository — required (typically the same as mongo_dump_restic_repo)
+mongo_restore_restic_repo: ""
+mongo_restore_restic_password: ""
+mongo_restore_restic_env: {}
+
+# Host packages installed by the role
+mongo_restore_packages:
+  - restic

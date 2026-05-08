@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: mongo_dump
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Schedules encrypted, off-site MongoDB dumps via mongodump + restic, driven by a systemd timer.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - backup
+    - mongodb
+    - restic
+    - systemd
+
+dependencies: []

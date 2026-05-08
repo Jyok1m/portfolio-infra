@@ -1,0 +1,73 @@
+---
+- name: "[{{ mongo_dump_name }}] Validate inputs"
+  ansible.builtin.assert:
+    that:
+      - mongo_dump_name | length > 0
+      - mongo_dump_name is match('^[a-z0-9][a-z0-9_-]*$')
+      - mongo_dump_username | length > 0
+      - mongo_dump_password | length > 0
+      - mongo_dump_restic_repo | length > 0
+      - mongo_dump_restic_password | length > 0
+    fail_msg: >-
+      mongo_dump requires mongo_dump_name (a-z0-9_-), Mongo credentials, and a
+      restic repository + password.
+    quiet: true
+
+- name: "[{{ mongo_dump_name }}] Install host packages"
+  ansible.builtin.apt:
+    name: "{{ mongo_dump_packages }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: "[{{ mongo_dump_name }}] Ensure local staging directory exists"
+  ansible.builtin.file:
+    path: "{{ mongo_dump_local_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: "[{{ mongo_dump_name }}] Render restic + Mongo env file"
+  ansible.builtin.template:
+    src: dump.env.j2
+    dest: "/etc/mongo-dump-{{ mongo_dump_name }}.env"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
+- name: "[{{ mongo_dump_name }}] Render dump script"
+  ansible.builtin.template:
+    src: dump.sh.j2
+    dest: "/usr/local/bin/mongo-dump-{{ mongo_dump_name }}.sh"
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: "[{{ mongo_dump_name }}] Render systemd service unit"
+  ansible.builtin.template:
+    src: dump.service.j2
+    dest: "/etc/systemd/system/mongo-dump-{{ mongo_dump_name }}.service"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd for mongo_dump
+
+- name: "[{{ mongo_dump_name }}] Render systemd timer unit"
+  ansible.builtin.template:
+    src: dump.timer.j2
+    dest: "/etc/systemd/system/mongo-dump-{{ mongo_dump_name }}.timer"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd for mongo_dump
+
+- name: "[{{ mongo_dump_name }}] Apply pending unit changes"
+  ansible.builtin.meta: flush_handlers
+
+- name: "[{{ mongo_dump_name }}] Enable and start the dump timer"
+  ansible.builtin.systemd_service:
+    name: "mongo-dump-{{ mongo_dump_name }}.timer"
+    state: "{{ mongo_dump_timer_state }}"
+    enabled: "{{ mongo_dump_timer_enabled }}"

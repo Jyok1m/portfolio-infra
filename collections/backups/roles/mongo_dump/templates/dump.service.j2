@@ -1,0 +1,15 @@
+[Unit]
+Description=Mongo dump + restic push ({{ mongo_dump_name }})
+Documentation=https://github.com/Jyok1m/portfolio-infra
+Wants=network-online.target docker.service
+After=network-online.target docker.service
+ConditionPathExists=/usr/local/bin/mongo-dump-{{ mongo_dump_name }}.sh
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/mongo-dump-{{ mongo_dump_name }}.env
+ExecStart=/usr/local/bin/mongo-dump-{{ mongo_dump_name }}.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=2h

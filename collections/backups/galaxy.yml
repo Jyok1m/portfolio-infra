@@ -1,0 +1,29 @@
+---
+namespace: jyok1m
+name: backups
+version: 1.0.0
+readme: README.md
+authors:
+  - Joachim Jasmin <joachim.jasmin-dev@proton.me>
+description: >-
+  Backup and restore roles for containerized data services. Logical dumps are
+  driven by systemd timers, encrypted, and shipped to a restic repository with
+  configurable retention.
+license:
+  - MIT
+tags:
+  - backup
+  - restore
+  - restic
+  - mongodb
+  - systemd
+  - infrastructure
+dependencies:
+  community.docker: ">=5.2.0"
+repository: https://github.com/Jyok1m/portfolio-infra
+documentation: https://github.com/Jyok1m/portfolio-infra
+homepage: https://github.com/Jyok1m/portfolio-infra
+issues: https://github.com/Jyok1m/portfolio-infra/issues
+build_ignore:
+  - extensions/molecule
+  - "*.tar.gz"

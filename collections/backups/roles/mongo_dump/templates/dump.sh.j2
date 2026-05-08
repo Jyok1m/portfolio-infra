@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Managed by Ansible — jyok1m.backups.mongo_dump ({{ mongo_dump_name }})
+set -euo pipefail
+
+NAME="{{ mongo_dump_name }}"
+LOCAL_DIR="{{ mongo_dump_local_dir }}"
+CONTAINER="{{ mongo_dump_container }}"
+NETWORK="{{ mongo_dump_network }}"
+IMAGE="{{ mongo_dump_image }}"
+PORT="{{ mongo_dump_port }}"
+AUTHDB="{{ mongo_dump_authdb }}"
+DB="{{ mongo_dump_db }}"
+KEEP_LOCAL="{{ mongo_dump_local_keep }}"
+
+# Restic env (repo, password, backend creds) is sourced from the env file by systemd.
+
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+ARCHIVE="${LOCAL_DIR}/${NAME}-${TS}.archive.gz"
+
+mkdir -p "${LOCAL_DIR}"
+chmod 0700 "${LOCAL_DIR}"
+
+DUMP_ARGS=(
+  --host "${CONTAINER}:${PORT}"
+  --username "${MONGO_DUMP_USERNAME}"
+  --password "${MONGO_DUMP_PASSWORD}"
+  --authenticationDatabase "${AUTHDB}"
+  --archive
+  --gzip
+)
+if [[ -n "${DB}" ]]; then
+  DUMP_ARGS+=(--db "${DB}")
+fi
+
+echo "[${NAME}] mongodump → ${ARCHIVE}"
+docker run --rm \
+  --network "${NETWORK}" \
+  -e MONGO_DUMP_USERNAME \
+  -e MONGO_DUMP_PASSWORD \
+  "${IMAGE}" \
+  mongodump "${DUMP_ARGS[@]}" > "${ARCHIVE}"
+
+{% if mongo_dump_restic_init %}
+echo "[${NAME}] ensure restic repository is initialized"
+restic snapshots --no-lock >/dev/null 2>&1 || restic init
+{% endif %}
+
+echo "[${NAME}] restic backup"
+restic backup \
+  --tag "mongo_dump" \
+  --tag "${NAME}" \
+  --host "$(hostname -s)" \
+  "${ARCHIVE}"
+
+echo "[${NAME}] restic forget --prune"
+restic forget \
+  --prune \
+  --tag "${NAME}" \
+  --keep-daily {{ mongo_dump_keep_daily }} \
+  --keep-weekly {{ mongo_dump_keep_weekly }} \
+  --keep-monthly {{ mongo_dump_keep_monthly }}
+
+echo "[${NAME}] trim local archives (keep ${KEEP_LOCAL})"
+ls -1t "${LOCAL_DIR}"/${NAME}-*.archive.gz 2>/dev/null \
+  | tail -n +$((KEEP_LOCAL + 1)) \
+  | xargs -r rm -f --
+
+echo "[${NAME}] done"
