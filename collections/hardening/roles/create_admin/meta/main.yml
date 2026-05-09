@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: create_admin
+  namespace: jyok1m
+  author: Joachim Jasmin
+  description: Creates an admin user with chosen name and authorizes an SSH public key for it.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+  galaxy_tags:
+    - admin
+    - user
+    - ssh
+    - hardening
+    - security
+
+dependencies: []

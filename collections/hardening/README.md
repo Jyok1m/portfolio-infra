@@ -6,6 +6,7 @@ Ansible collection providing baseline Linux hardening roles.
 
 | Role                              | Description                                                          |
 | --------------------------------- | -------------------------------------------------------------------- |
+| `jyok1m.hardening.create_admin`   | Creates an admin user and authorizes an SSH public key for it.       |
 | `jyok1m.hardening.ssh_hardening`  | Renders a hardened `sshd_config` (validated before reload).          |
 | `jyok1m.hardening.firewall`       | Installs and configures UFW with a deny-by-default ingress policy.   |
 | `jyok1m.hardening.fail2ban`       | Installs `fail2ban` with a UFW-backed `sshd` jail.                   |
@@ -27,6 +28,13 @@ ansible-galaxy collection install jyok1m.hardening
 Each role is a standalone unit — invoke it with `import_role` (or `include_role`) and pass its variables under `vars:`.
 
 ```yaml
+- name: Create admin account
+  ansible.builtin.import_role:
+    name: jyok1m.hardening.create_admin
+  vars:
+    admin_username: deploy
+    admin_public_key: "ssh-ed25519 AAAAC3Nza... user@host"
+
 - name: Apply SSH hardening
   ansible.builtin.import_role:
     name: jyok1m.hardening.ssh_hardening

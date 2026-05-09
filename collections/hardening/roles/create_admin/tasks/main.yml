@@ -1,0 +1,33 @@
+---
+- name: Validate inputs
+  ansible.builtin.assert:
+    that:
+      - admin_username | length > 0
+      - admin_public_key | length > 0
+    fail_msg: "admin_username and admin_public_key are required"
+
+- name: Create admin user
+  ansible.builtin.user:
+    name: "{{ admin_username }}"
+    groups: "{{ admin_groups }}"
+    append: true
+    shell: "{{ admin_shell }}"
+    create_home: true
+    state: present
+
+- name: Authorize SSH public key for admin
+  ansible.posix.authorized_key:
+    user: "{{ admin_username }}"
+    key: "{{ admin_public_key }}"
+    state: present
+    exclusive: "{{ admin_authorized_key_exclusive }}"
+
+- name: Grant passwordless sudo to admin
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ admin_username }}"
+    content: "{{ admin_username }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: /usr/sbin/visudo -cf %s
+  when: admin_passwordless_sudo
