@@ -50,6 +50,8 @@ Each role is a standalone unit — invoke it with `import_role` (or `include_rol
       - { port: 2222, proto: tcp, comment: SSH }
       - { port: 80, proto: tcp, comment: HTTP }
       - { port: 443, proto: tcp, comment: HTTPS }
+    ufw_allowed_sources:
+      - { src: "10.42.0.0/24", comment: "vRack intra-cluster" }
 
 - name: Apply fail2ban hardening
   ansible.builtin.import_role:

@@ -14,6 +14,13 @@
     comment: "{{ item.comment | default(omit) }}"
   loop: "{{ ufw_allowed_ports }}"
 
+- name: Allow trusted source networks
+  community.general.ufw:
+    rule: allow
+    src: "{{ item.src }}"
+    comment: "{{ item.comment | default(omit) }}"
+  loop: "{{ ufw_allowed_sources }}"
+
 - name: Set default ingress policy
   community.general.ufw:
     default: "{{ ufw_default_incoming }}"

@@ -1,7 +1,7 @@
 ---
 namespace: jyok1m
 name: hardening
-version: 1.1.0
+version: 1.2.0
 readme: README.md
 authors:
   - Joachim Jasmin <joachim.jasmin-dev@proton.me>

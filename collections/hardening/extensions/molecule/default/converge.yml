@@ -18,6 +18,8 @@
         ufw_allowed_ports:
           - { port: 2222, proto: tcp, comment: SSH }
           - { port: 80, proto: tcp, comment: HTTP }
+        ufw_allowed_sources:
+          - { src: "10.99.0.0/24", comment: "test trusted subnet" }
     - role: jyok1m.hardening.fail2ban
       vars:
         fail2ban_ssh_port: 2222
