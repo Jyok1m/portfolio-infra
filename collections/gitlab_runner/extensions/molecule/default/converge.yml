@@ -1,0 +1,40 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    # Fake but format-valid auth token — the role's assert requires the glrt- prefix.
+    test_token: "glrt-moleculemoleculemolecule"
+  pre_tasks:
+    - name: Ensure /etc/docker exists
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        mode: "0755"
+
+    - name: Configure inner Docker daemon for DinD (vfs storage avoids overlay-on-overlay)
+      ansible.builtin.copy:
+        content: |
+          {
+            "storage-driver": "vfs",
+            "features": {
+              "containerd-snapshotter": false
+            }
+          }
+        dest: /etc/docker/daemon.json
+        mode: "0644"
+
+    - name: Install Docker via the docker_compose collection
+      ansible.builtin.import_role:
+        name: jyok1m.docker_compose.install
+
+  tasks:
+    - name: Apply gitlab_runner install role
+      ansible.builtin.import_role:
+        name: jyok1m.gitlab_runner.install
+      vars:
+        gitlab_runner_token: "{{ test_token }}"
+        gitlab_runner_name: "molecule-runner"
+        # The token is fake — don't actually start the service or it'll spam errors trying to reach gitlab.com.
+        gitlab_runner_service_state: stopped
+        gitlab_runner_service_enabled: false

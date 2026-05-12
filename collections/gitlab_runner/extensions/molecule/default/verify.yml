@@ -1,0 +1,50 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  vars:
+    test_token: "glrt-moleculemoleculemolecule"
+  tasks:
+    - name: Check that gitlab-runner binary is installed
+      ansible.builtin.stat:
+        path: /usr/bin/gitlab-runner
+      register: runner_bin
+      failed_when: not runner_bin.stat.exists
+
+    - name: Check that config.toml is locked down
+      ansible.builtin.stat:
+        path: /etc/gitlab-runner/config.toml
+      register: config_stat
+      failed_when: not config_stat.stat.exists or config_stat.stat.mode != '0600'
+
+    - name: Read config.toml to assert content
+      ansible.builtin.slurp:
+        src: /etc/gitlab-runner/config.toml
+      register: config_slurp
+
+    - name: Assert config.toml contains the expected docker-executor block
+      ansible.builtin.assert:
+        that:
+          - >-
+            'token = "' ~ test_token ~ '"' in config_content
+          - >-
+            'executor = "docker"' in config_content
+          - >-
+            'privileged = true' in config_content
+          - >-
+            'image = "docker:24"' in config_content
+        quiet: true
+      vars:
+        config_content: "{{ config_slurp.content | b64decode }}"
+
+    - name: Check that gitlab-runner user is in the docker group
+      ansible.builtin.command: id -nG gitlab-runner
+      register: runner_groups
+      changed_when: false
+      failed_when: "'docker' not in runner_groups.stdout.split()"
+
+    - name: Confirm the service unit is present and disabled (test mode)
+      ansible.builtin.command: systemctl is-enabled gitlab-runner
+      register: runner_enabled
+      changed_when: false
+      failed_when: runner_enabled.stdout not in ['disabled', 'masked']

@@ -1,0 +1,47 @@
+---
+# Required: GitLab Runner authentication token from the gitlab.com UI
+# (Settings → CI/CD → Runners → New project/group/instance runner).
+# Format: glrt-XXXXXXXXXXXXXXXXXXXX. Treat as a secret — pass from vault.
+gitlab_runner_token: ""
+
+# GitLab instance URL. gitlab.com by default.
+gitlab_runner_url: "https://gitlab.com/"
+
+# Runner identity (informational — actual description/tags/lock are managed in the UI
+# when you create the runner and bind the auth token).
+gitlab_runner_name: "{{ ansible_hostname }}-docker"
+
+# Top-level config
+gitlab_runner_concurrent: 4
+gitlab_runner_check_interval: 0
+gitlab_runner_log_level: "info"
+gitlab_runner_session_timeout: 1800
+
+# Executor configuration (docker)
+gitlab_runner_executor: "docker"
+gitlab_runner_default_image: "docker:24"
+gitlab_runner_privileged: true
+gitlab_runner_pull_policy: "if-not-present"
+gitlab_runner_shm_size: 0
+gitlab_runner_volumes:
+  - "/cache"
+gitlab_runner_network_mode: ""
+gitlab_runner_extra_hosts: []
+
+# Extra env vars injected into every job (e.g. registry hints)
+gitlab_runner_environment: []
+
+# Apt repository
+gitlab_runner_apt_distribution: "{{ ansible_distribution_release }}"
+gitlab_runner_apt_repo_url: "https://packages.gitlab.com/runner/gitlab-runner/debian"
+gitlab_runner_apt_gpg_url: "https://packages.gitlab.com/runner/gitlab-runner/gpgkey"
+gitlab_runner_apt_keyring: "/etc/apt/keyrings/gitlab-runner.gpg"
+
+# Service state — flip to stopped/false in molecule or staging where the token is fake
+gitlab_runner_service_state: started
+gitlab_runner_service_enabled: true
+
+# Whether to add the gitlab-runner system user to the docker group.
+# Required for the docker executor to talk to the host docker socket — but the
+# docker group must already exist (i.e. Docker is already installed on the host).
+gitlab_runner_join_docker_group: true

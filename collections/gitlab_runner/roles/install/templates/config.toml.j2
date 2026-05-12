@@ -1,0 +1,28 @@
+concurrent = {{ gitlab_runner_concurrent }}
+check_interval = {{ gitlab_runner_check_interval }}
+log_level = "{{ gitlab_runner_log_level }}"
+
+[session_server]
+  session_timeout = {{ gitlab_runner_session_timeout }}
+
+[[runners]]
+  name = "{{ gitlab_runner_name }}"
+  url = "{{ gitlab_runner_url }}"
+  token = "{{ gitlab_runner_token }}"
+  executor = "{{ gitlab_runner_executor }}"
+{% if gitlab_runner_environment %}
+  environment = {{ gitlab_runner_environment | to_json }}
+{% endif %}
+  [runners.docker]
+    image = "{{ gitlab_runner_default_image }}"
+    privileged = {{ gitlab_runner_privileged | to_json }}
+    pull_policy = "{{ gitlab_runner_pull_policy }}"
+    shm_size = {{ gitlab_runner_shm_size }}
+    volumes = {{ gitlab_runner_volumes | to_json }}
+{% if gitlab_runner_network_mode %}
+    network_mode = "{{ gitlab_runner_network_mode }}"
+{% endif %}
+{% if gitlab_runner_extra_hosts %}
+    extra_hosts = {{ gitlab_runner_extra_hosts | to_json }}
+{% endif %}
+  [runners.cache]

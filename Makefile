@@ -5,7 +5,7 @@ TAGS ?=
 ANSIBLE_ARGS = -i $(INVENTORY_FILE) --vault-password-file $(VAULT_PASSWORD_FILE) $(if $(TAGS),--tags $(TAGS))
 
 .DEFAULT_GOAL := help
-.PHONY: help install-collections setup-hooks lint ping edit-vault encrypt-vault encrypt-vault-and-stage decrypt-vault dry-run run molecule-test publish-collection-docker_compose publish-collection-hardening publish-collection-k3s
+.PHONY: help install-collections setup-hooks lint ping edit-vault encrypt-vault encrypt-vault-and-stage decrypt-vault dry-run run molecule-test publish-collection-docker_compose publish-collection-hardening publish-collection-k3s publish-collection-backups publish-collection-gitlab_runner
 
 # ------------------------------------------------------------------ #
 #                                Help                                #
@@ -40,6 +40,7 @@ help:
 	@echo "	publish-collection-hardening		Build and publish jyok1m.hardening to Ansible Galaxy"
 	@echo "	publish-collection-k3s			Build and publish jyok1m.k3s to Ansible Galaxy"
 	@echo "	publish-collection-backups			Build and publish jyok1m.backups to Ansible Galaxy"
+	@echo "	publish-collection-gitlab_runner		Build and publish jyok1m.gitlab_runner to Ansible Galaxy"
 	@echo ""
 	@echo "Molecule:"
 	@echo "	molecule-test TAGS=<name>		Run molecule test on collections/<name> (all scenarios)"
@@ -130,3 +131,6 @@ publish-collection-k3s:
 
 publish-collection-backups:
 	./scripts/publish-collection.sh backups
+
+publish-collection-gitlab_runner:
+	./scripts/publish-collection.sh gitlab_runner

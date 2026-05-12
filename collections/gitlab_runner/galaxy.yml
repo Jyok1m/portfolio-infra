@@ -1,0 +1,28 @@
+---
+namespace: jyok1m
+name: gitlab_runner
+version: 1.0.0
+readme: README.md
+authors:
+  - Joachim Jasmin <joachim.jasmin-dev@proton.me>
+description: >-
+  Installs the official GitLab Runner package on Debian Trixie and configures
+  it as a system-mode service with the docker executor, ready to pick up
+  jobs from gitlab.com.
+license:
+  - MIT
+tags:
+  - gitlab
+  - ci
+  - runner
+  - docker
+  - infrastructure
+dependencies:
+  community.docker: ">=5.2.0"
+repository: https://github.com/Jyok1m/portfolio-infra
+documentation: https://github.com/Jyok1m/portfolio-infra
+homepage: https://github.com/Jyok1m/portfolio-infra
+issues: https://github.com/Jyok1m/portfolio-infra/issues
+build_ignore:
+  - extensions/molecule
+  - "*.tar.gz"

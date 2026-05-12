@@ -14,5 +14,7 @@ collections:
     version: "==1.0.1"
   - name: jyok1m.backups
     version: "==1.0.0"
+  - name: jyok1m.gitlab_runner
+    version: "==1.0.0"
   # - source: ./collections/k3s
   #   type: dir
