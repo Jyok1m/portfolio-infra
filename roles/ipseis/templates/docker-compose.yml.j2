@@ -70,10 +70,21 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.{{ portfolio_domain_com }}`) || Host(`ipseis-backend.{{ portfolio_domain_fr }}`)
+      # Principal
+      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.{{ portfolio_domain_fr }}`)
       - traefik.http.routers.ipseis-api.entrypoints=websecure
       - traefik.http.routers.ipseis-api.tls.certresolver=letsencrypt
       - traefik.http.services.ipseis-api.loadbalancer.server.port=3000
+      # Redirect from .com to .fr
+      - traefik.http.routers.ipseis-api-redirect.rule=Host(`ipseis-backend.{{ portfolio_domain_com }}`)                                                                                                                             
+      - traefik.http.routers.ipseis-api-redirect.entrypoints=websecure                                                                                                                                                             
+      - traefik.http.routers.ipseis-api-redirect.tls.certresolver=letsencrypt                                                                                                                                                      
+      - traefik.http.routers.ipseis-api-redirect.service=ipseis-api                                                                                                                                                                
+      - traefik.http.routers.ipseis-api-redirect.middlewares=ipseis-api-redirect
+      # Middleware to perform the redirection
+      - traefik.http.middlewares.ipseis-api-redirect.redirectregex.regex=^https?://ipseis-backend\.{{ portfolio_domain_com | replace('.', '\\.') }}/(.*)                                                                            
+      - traefik.http.middlewares.ipseis-api-redirect.redirectregex.replacement=https://ipseis-backend.{{ portfolio_domain_fr }}/$${1}                                                                                             
+      - traefik.http.middlewares.ipseis-api-redirect.redirectregex.permanent=true  
 
 volumes:
   ipseis-db:

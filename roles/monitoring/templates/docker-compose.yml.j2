@@ -40,14 +40,26 @@ services:
 {% endif %}
 {% if monitoring_is_hub %}
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.prom.rule=Host(`prometheus.{{ portfolio_domain_com }}`) || Host(`prometheus.{{ portfolio_domain_fr }}`)
-      - traefik.http.routers.prom.entrypoints=websecure
+      - traefik.enable=true                                                                                                                                                                                                    
+      # Main router (.com) — auth + real backend
+      - traefik.http.routers.prom.rule=Host(`prometheus.{{ portfolio_domain_com }}`)                                                                                                                                           
+      - traefik.http.routers.prom.entrypoints=websecure                                                                                                                                                                        
       - traefik.http.routers.prom.tls.certresolver=letsencrypt
-      - traefik.http.services.prom.loadbalancer.server.port=9090
-      # htpasswd -nbB admin 'TonMotDePasseFort'
-      - traefik.http.routers.prom.middlewares=prom-auth
-      - traefik.http.middlewares.prom-auth.basicauth.users={{ vault_prometheus_basic_auth | replace('$', '$$') }}
+      - traefik.http.routers.prom.service=prom                                                                                                                                                                                 
+      - traefik.http.routers.prom.middlewares=prom-auth                                                                                                                                                                      
+      - traefik.http.services.prom.loadbalancer.server.port=9090                                                                                                                                                               
+      # Redirect router (.fr → .com)                                                                                                                                                                                         
+      - traefik.http.routers.prom-fr.rule=Host(`prometheus.{{ portfolio_domain_fr }}`)                                                                                                                                         
+      - traefik.http.routers.prom-fr.entrypoints=websecure                                                                                                                                                                     
+      - traefik.http.routers.prom-fr.tls.certresolver=letsencrypt
+      - traefik.http.routers.prom-fr.service=prom                                                                                                                                                                              
+      - traefik.http.routers.prom-fr.middlewares=prom-redirect                                                                                                                                                               
+      # Middlewares                                                                                                                                                                                                            
+      - traefik.http.middlewares.prom-redirect.redirectregex.regex=^https?://prometheus\.{{ portfolio_domain_fr | replace('.', '\\.') }}/(.*)                                                                                
+      - traefik.http.middlewares.prom-redirect.redirectregex.replacement=https://prometheus.{{ portfolio_domain_com }}/$${1}                                                                                                   
+      - traefik.http.middlewares.prom-redirect.redirectregex.permanent=true                                                                                                                                                    
+      # htpasswd -nbB admin 'password'                                                                                                                                                                                         
+      - traefik.http.middlewares.prom-auth.basicauth.users={{ vault_prometheus_basic_auth | replace('$', '$$') }}   
 
   grafana:
     image: {{ grafana_image }}
@@ -74,12 +86,24 @@ services:
     networks:
       - monitoring-internal
       - traefik-public
-    labels:
+    labels:                                                                                                                                                                                                                  
       - traefik.enable=true
-      - traefik.http.routers.grafana.rule=Host(`grafana.{{ portfolio_domain_com }}`) || Host(`grafana.{{ portfolio_domain_fr }}`)
-      - traefik.http.routers.grafana.entrypoints=websecure
+      # Main router (.com)
+      - traefik.http.routers.grafana.rule=Host(`grafana.{{ portfolio_domain_com }}`)
+      - traefik.http.routers.grafana.entrypoints=websecure                                                                                                                                                                     
       - traefik.http.routers.grafana.tls.certresolver=letsencrypt
-      - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - traefik.http.routers.grafana.service=grafana                                                                                                                                                                           
+      - traefik.http.services.grafana.loadbalancer.server.port=3000                                                                                                                                                          
+      # Redirect router (.fr → .com)                                                                                                                                                                                           
+      - traefik.http.routers.grafana-fr.rule=Host(`grafana.{{ portfolio_domain_fr }}`)                                                                                                                                       
+      - traefik.http.routers.grafana-fr.entrypoints=websecure                                                                                                                                                                  
+      - traefik.http.routers.grafana-fr.tls.certresolver=letsencrypt                                                                                                                                                           
+      - traefik.http.routers.grafana-fr.service=grafana
+      - traefik.http.routers.grafana-fr.middlewares=grafana-redirect                                                                                                                                                           
+      # Middleware                                                                                                                                                                                                           
+      - traefik.http.middlewares.grafana-redirect.redirectregex.regex=^https?://grafana\.{{ portfolio_domain_fr | replace('.', '\\.') }}/(.*)                                                                                  
+      - traefik.http.middlewares.grafana-redirect.redirectregex.replacement=https://grafana.{{ portfolio_domain_com }}/$${1}                                                                                                   
+      - traefik.http.middlewares.grafana-redirect.redirectregex.permanent=true    
 {% endif %}
 
   node-exporter:

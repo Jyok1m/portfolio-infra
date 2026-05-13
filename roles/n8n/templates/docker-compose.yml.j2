@@ -1,0 +1,95 @@
+---
+services:
+  n8n-db:
+    image: {{ n8n_db_image }}
+    container_name: n8n-db
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: 1.0
+        reservations:
+          memory: 256M
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "pg_isready -U {{ vault_n8n_db_user }} -d {{ n8n_db_name }}"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    environment:
+      - POSTGRES_DB={{ n8n_db_name }}
+      - POSTGRES_USER={{ vault_n8n_db_user }}
+      - POSTGRES_PASSWORD={{ vault_n8n_db_password }}
+    volumes:
+      - n8n-db:/var/lib/postgresql/data
+    networks:
+      - n8n-internal
+
+  n8n:
+    image: {{ n8n_image }}
+    container_name: n8n
+    restart: unless-stopped
+    depends_on:
+      n8n-db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: 2.0
+        reservations:
+          memory: 512M
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=n8n-db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE={{ n8n_db_name }}
+      - DB_POSTGRESDB_USER={{ vault_n8n_db_user }}
+      - DB_POSTGRESDB_PASSWORD={{ vault_n8n_db_password }}
+      - N8N_ENCRYPTION_KEY={{ vault_n8n_encryption_key }}
+      - N8N_HOST=n8n.{{ portfolio_domain_com }}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - N8N_EDITOR_BASE_URL=https://n8n.{{ portfolio_domain_com }}
+      - WEBHOOK_URL=https://n8n.{{ portfolio_domain_com }}/
+      - GENERIC_TIMEZONE={{ n8n_timezone }}
+      - TZ={{ n8n_timezone }}
+      - N8N_PROXY_HOPS=1
+    volumes:
+      - n8n:/home/node/.n8n
+    networks:
+      - n8n-internal
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.rule=Host(`n8n.{{ portfolio_domain_com }}`)
+      - traefik.http.routers.n8n.entrypoints=websecure
+      - traefik.http.routers.n8n.tls.certresolver=letsencrypt
+      - traefik.http.services.n8n.loadbalancer.server.port=5678
+      # Redirect from .fr to .com
+      - traefik.http.routers.n8n-redirect.rule=Host(`n8n.{{ portfolio_domain_fr }}`)                                                                                                                             
+      - traefik.http.routers.n8n-redirect.entrypoints=websecure                                                                                                                                                             
+      - traefik.http.routers.n8n-redirect.tls.certresolver=letsencrypt                                                                                                                                                      
+      - traefik.http.routers.n8n-redirect.service=n8n                                                                                                                                                                
+      - traefik.http.routers.n8n-redirect.middlewares=n8n-redirect
+      # Middleware to perform the redirection
+      - traefik.http.middlewares.n8n-redirect.redirectregex.regex=^https?://n8n\.{{ portfolio_domain_fr | replace('.', '\\.') }}/(.*)                                                                            
+      - traefik.http.middlewares.n8n-redirect.redirectregex.replacement=https://n8n.{{ portfolio_domain_com }}/$${1}                                                                                             
+      - traefik.http.middlewares.n8n-redirect.redirectregex.permanent=true  
+
+volumes:
+  n8n:
+    name: n8n
+  n8n-db:
+    name: n8n-db
+
+networks:
+  n8n-internal:
+    name: n8n-internal
+    internal: true
+  traefik-public:
+    name: traefik-public
+    external: true

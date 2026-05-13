@@ -1,0 +1,14 @@
+---
+app_name: n8n
+app_path: /opt/{{ app_name }}
+
+n8n_image_name: n8nio/n8n
+n8n_image_tag: 2.21.1
+n8n_image: "{{ n8n_image_name }}:{{ n8n_image_tag }}"
+
+n8n_db_image_name: postgres
+n8n_db_image_tag: 14.22-trixie
+n8n_db_image: "{{ n8n_db_image_name }}:{{ n8n_db_image_tag }}"
+
+n8n_db_name: n8n
+n8n_timezone: Europe/Paris

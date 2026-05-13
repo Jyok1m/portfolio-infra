@@ -31,4 +31,5 @@
   hosts: all
   roles:
     - { role: mongo_test, tags: [mongo_test] }
+    - { role: n8n, tags: [n8n] }
   tags: [private]

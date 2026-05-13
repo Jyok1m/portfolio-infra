@@ -58,13 +58,21 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jenkins.rule=Host(`jenkins.{{ portfolio_domain_com }}`) || Host(`jenkins.{{ portfolio_domain_fr }}`) 
+      # Principal
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.{{ portfolio_domain_com }}`)
       - traefik.http.routers.jenkins.entrypoints=websecure
       - traefik.http.routers.jenkins.tls.certresolver=letsencrypt
       - traefik.http.services.jenkins.loadbalancer.server.port=8080
-      - traefik.http.routers.jenkins.middlewares=jenkins-headers
-      - traefik.http.middlewares.jenkins-headers.headers.customrequestheaders.X-Forwarded-Proto=https
-      - traefik.http.middlewares.jenkins-headers.headers.customrequestheaders.X-Forwarded-Port=443
+      # Redirect from .fr to .com
+      - traefik.http.routers.jenkins-redirect.rule=Host(`jenkins.{{ portfolio_domain_fr }}`)                                                                                                                             
+      - traefik.http.routers.jenkins-redirect.entrypoints=websecure                                                                                                                                                             
+      - traefik.http.routers.jenkins-redirect.tls.certresolver=letsencrypt                                                                                                                                                      
+      - traefik.http.routers.jenkins-redirect.service=jenkins                                                                                                                                                                
+      - traefik.http.routers.jenkins-redirect.middlewares=jenkins-redirect
+      # Middleware to perform the redirection
+      - traefik.http.middlewares.jenkins-redirect.redirectregex.regex=^https?://jenkins\.{{ portfolio_domain_fr | replace('.', '\\.') }}/(.*)                                                                            
+      - traefik.http.middlewares.jenkins-redirect.redirectregex.replacement=https://jenkins.{{ portfolio_domain_com }}/$${1}                                                                                             
+      - traefik.http.middlewares.jenkins-redirect.redirectregex.permanent=true
 
 volumes:
   jenkins:
