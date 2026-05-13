@@ -23,20 +23,32 @@ services:
       - --web.console.templates=/etc/prometheus/consoles
       - --storage.tsdb.retention.time=720h
       - --web.enable-lifecycle
-      - --web.external-url=https://prometheus.{{ base_domain }}
+{% if monitoring_is_hub %}
+      - --web.external-url=https://prometheus.{{ portfolio_domain_com }}
+{% endif %}
     volumes:
       - prometheus:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+{% if not monitoring_is_hub %}
+    ports:
+      - "{{ vrack_ip }}:{{ monitoring_federation_port }}:9090"
+{% endif %}
     networks:
       - monitoring-internal
+{% if 'edge' in group_names %}
       - traefik-public
+{% endif %}
+{% if monitoring_is_hub %}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.prom.rule=Host(`prometheus.{{ base_domain }}`) || Host(`prometheus.{{ base_domain_fr }}`) 
+      - traefik.http.routers.prom.rule=Host(`prometheus.{{ portfolio_domain_com }}`) || Host(`prometheus.{{ portfolio_domain_fr }}`)
       - traefik.http.routers.prom.entrypoints=websecure
       - traefik.http.routers.prom.tls.certresolver=letsencrypt
       - traefik.http.services.prom.loadbalancer.server.port=9090
-    
+      # htpasswd -nbB admin 'TonMotDePasseFort'
+      - traefik.http.routers.prom.middlewares=prom-auth
+      - traefik.http.middlewares.prom-auth.basicauth.users={{ vault_prometheus_basic_auth | replace('$', '$$') }}
+
   grafana:
     image: {{ grafana_image }}
     container_name: grafana
@@ -53,7 +65,7 @@ services:
           memory: 128M
     environment:
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=https://grafana.{{ base_domain }}
+      - GF_SERVER_ROOT_URL=https://grafana.{{ portfolio_domain_com }}
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
       - GF_METRICS_ENABLED=true
     volumes:
@@ -64,10 +76,11 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.grafana.rule=Host(`grafana.{{ base_domain }}`) || Host(`grafana.{{ base_domain_fr }}`) 
+      - traefik.http.routers.grafana.rule=Host(`grafana.{{ portfolio_domain_com }}`) || Host(`grafana.{{ portfolio_domain_fr }}`)
       - traefik.http.routers.grafana.entrypoints=websecure
       - traefik.http.routers.grafana.tls.certresolver=letsencrypt
       - traefik.http.services.grafana.loadbalancer.server.port=3000
+{% endif %}
 
   node-exporter:
     image: {{ node_exporter_image }}
@@ -118,13 +131,16 @@ services:
 volumes:
   prometheus:
     name: prometheus
+{% if monitoring_is_hub %}
   grafana:
     name: grafana
+{% endif %}
 
 networks:
   monitoring-internal:
     name: monitoring-internal
-    internal: true 
+{% if 'edge' in group_names %}
   traefik-public:
     name: traefik-public
     external: true
+{% endif %}

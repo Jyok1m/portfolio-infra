@@ -17,9 +17,9 @@ services:
         - mongosh
         - --quiet
         - --username
-        - "{{ ipseis_db_root_user }}"
+        - "{{ vault_ipseis_db_root_user }}"
         - --password
-        - "{{ ipseis_db_root_password }}"
+        - "{{ vault_ipseis_db_root_password }}"
         - --authenticationDatabase
         - admin
         - --eval
@@ -30,13 +30,13 @@ services:
       start_period: 30s
     command: --wiredTigerCacheSizeGB 1
     environment:
-      - MONGO_INITDB_ROOT_USERNAME={{ ipseis_db_root_user }}
-      - MONGO_INITDB_ROOT_PASSWORD={{ ipseis_db_root_password }}
+      - MONGO_INITDB_ROOT_USERNAME={{ vault_ipseis_db_root_user }}
+      - MONGO_INITDB_ROOT_PASSWORD={{ vault_ipseis_db_root_password }}
     volumes:
       - ipseis-db:/data/db
       - ipseis-db-configdb:/data/configdb
     ports:
-      - "127.0.0.1:{{ ipseis_db_external_port }}:27017/tcp"
+      - "127.0.0.1:{{ vault_ipseis_db_external_port }}:27017/tcp"
     networks:
       - ipseis-internal
 
@@ -55,14 +55,14 @@ services:
       - NODE_OPTIONS=--max-old-space-size=768
       - NODE_ENV=production
       - USER_AGENT_ENV=prod
-      - MONGODB_URI={{ ipseis_db_uri }}
+      - MONGODB_URI={{ vault_ipseis_db_uri }}
       - FRONTEND_URL=https://ipseis.fr
-      - JWT_SECRET={{ ipseis_jwt_secret }}
+      - JWT_SECRET={{ vault_ipseis_jwt_secret }}
       - NODEMAILER_EMAIL="ipseis.ne.pas.repondre@gmail.com"
-      - NODEMAILER_PASSWORD={{ ipseis_nodemailer_password }}
+      - NODEMAILER_PASSWORD={{ vault_ipseis_nodemailer_password }}
       - NODEMAILER_EMAIL_TO="helenedm@ipseis.fr"
-      - BACKEND_USERNAME={{ ipseis_db_root_user }}
-      - BACKEND_PASSWORD={{ ipseis_db_root_password }}
+      - BACKEND_USERNAME={{ vault_ipseis_db_root_user }}
+      - BACKEND_PASSWORD={{ vault_ipseis_db_root_password }}
     volumes:
       - "{{ app_path }}/uploads:/app/public/uploads"
     networks:
@@ -70,7 +70,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.{{ base_domain }}`) || Host(`ipseis-backend.{{ base_domain_fr }}`)
+      - traefik.http.routers.ipseis-api.rule=Host(`ipseis-backend.{{ portfolio_domain_com }}`) || Host(`ipseis-backend.{{ portfolio_domain_fr }}`)
       - traefik.http.routers.ipseis-api.entrypoints=websecure
       - traefik.http.routers.ipseis-api.tls.certresolver=letsencrypt
       - traefik.http.services.ipseis-api.loadbalancer.server.port=3000

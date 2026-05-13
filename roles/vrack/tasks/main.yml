@@ -1,0 +1,31 @@
+---
+- name: Deploy vRack netplan config
+  ansible.builtin.copy:
+    dest: /etc/netplan/60-vrack.yaml
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      network:
+        version: 2
+        ethernets:
+          {{ vrack_iface }}:
+            dhcp4: false
+            dhcp6: false
+            accept-ra: false
+            addresses:
+              - {{ vrack_ip }}/{{ vrack_cidr }}
+            mtu: {{ vrack_mtu }}
+  notify: Reload vrack
+
+# On flush ici pour que l'iface soit up avant le test ping
+- name: Apply network changes now
+  ansible.builtin.meta: flush_handlers
+
+- name: Verify interface is up with expected IP
+  ansible.builtin.command: "ip -br addr show {{ vrack_iface }}"
+  register: iface_state
+  changed_when: false
+  retries: 10
+  delay: 2
+  until: vrack_ip in iface_state.stdout

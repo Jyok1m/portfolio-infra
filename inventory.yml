@@ -1,13 +1,22 @@
 ---
-portfolio_group:
-  hosts:
-    ovh_host:
-      ansible_host: "{{ ovh_portfolio_ip }}"
-      ansible_port: "{{ ovh_portfolio_port }}"
-      ansible_user: "{{ ovh_portfolio_user }}"
-      ansible_ssh_private_key_file: "{{ ovh_portfolio_ssh_key_path }}"
-      ansible_python_interpreter: /usr/bin/python3
+all:
+  children:
+    infra:
+      hosts:
+        main-host:
+          ansible_port: "{{ vault_ssh_port_hardened }}"
+    edge:
+      hosts:
+        main-host:
+          ansible_port: "{{ vault_ssh_port_hardened }}"
   vars:
+    ansible_host: "{{ vault_public_ip }}"
+    ansible_user: "{{ admin_user }}"
+    ansible_ssh_private_key_file: "{{ ssh_private_key_path }}"
     ansible_become: true
     ansible_become_method: sudo
     ansible_deprecation_warnings: false
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_python_interpreter: /usr/bin/python3
+    vrack_cidr: 24
+    vrack_mtu: 1500

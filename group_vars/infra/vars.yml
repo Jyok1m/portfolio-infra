@@ -1,0 +1,8 @@
+---
+portfolio_domain_com: joachimjasmin.com
+portfolio_domain_fr: joachimjasmin.fr
+
+vrack_subnet: 10.42.0.0/24
+ufw_allowed_sources:
+  - src: "{{ vrack_subnet }}"
+    comment: "vRack intra-cluster"

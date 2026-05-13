@@ -9,8 +9,6 @@
       - src: docker-compose.yml.j2
         dest: docker-compose.yml
         no_log: true
-    docker_compose_files:
-      - src: prometheus.yml
+      - src: prometheus.yml.j2
         dest: prometheus.yml
-      - src: grafana/
-        dest: grafana/
+    docker_compose_files: "{{ [{'src': 'grafana/', 'dest': 'grafana/'}] if monitoring_is_hub else [] }}"

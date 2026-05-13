@@ -109,7 +109,7 @@
     container: jenkins-gui
     user: root
     command: >-
-      bash -c "ssh-keyscan -t ed25519 -p {{ ovh_portfolio_port }} {{ jenkins_docker_gateway }} >> /var/jenkins_home/.ssh/known_hosts &&
+      bash -c "ssh-keyscan -t ed25519 -p {{ vault_ssh_port_hardened }} {{ jenkins_docker_gateway }} >> /var/jenkins_home/.ssh/known_hosts &&
       chown jenkins:jenkins /var/jenkins_home/.ssh/known_hosts"
   when: host_known_check.rc != 0
   changed_when: true

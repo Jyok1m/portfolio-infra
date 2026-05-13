@@ -1,0 +1,6 @@
+---
+admin_user: debian
+ssh_private_key_path: ~/.ssh/portfolio/id_ed25519_ovh-server
+
+vrack_ip: 10.42.0.10
+vrack_iface: enp7s0

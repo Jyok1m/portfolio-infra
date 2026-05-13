@@ -1,7 +1,7 @@
 ---
 services:
   mongo-test:
-    image: {{ ipseis_db_image }}
+    image: {{ mongo_test_db_image }}
     container_name: mongo-test
     restart: unless-stopped
     deploy:
@@ -17,9 +17,9 @@ services:
         - mongosh
         - --quiet
         - --username
-        - "{{ mongo_test_db_root_user }}"
+        - "{{ vault_mongo_test_db_root_user }}"
         - --password
-        - "{{ mongo_test_db_root_password }}"
+        - "{{ vault_mongo_test_db_root_password }}"
         - --authenticationDatabase
         - admin
         - --eval
@@ -30,13 +30,13 @@ services:
       start_period: 30s
     command: --wiredTigerCacheSizeGB 1
     environment:
-      - MONGO_INITDB_ROOT_USERNAME={{ mongo_test_db_root_user }}
-      - MONGO_INITDB_ROOT_PASSWORD={{ mongo_test_db_root_password }}
+      - MONGO_INITDB_ROOT_USERNAME={{ vault_mongo_test_db_root_user }}
+      - MONGO_INITDB_ROOT_PASSWORD={{ vault_mongo_test_db_root_password }}
     volumes:
       - mongo-test:/data/db
       - mongo-test-configdb:/data/configdb
     ports:
-      - "127.0.0.1:{{ mongo_test_db_external_port }}:27017"
+      - "127.0.0.1:{{ vault_mongo_test_db_external_port }}:27017"
     networks:
       - mongo-test-internal
 

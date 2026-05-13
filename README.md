@@ -19,7 +19,7 @@ All apps are deployed as Docker Compose stacks via `jyok1m.docker_compose.deploy
 ```
 .
 ├── site.yml                # Main playbook (ordered roles)
-├── inventory.yml           # Single host: ovh_host
+├── inventory.yml           # Single host: main-host
 ├── group_vars/             # Vault-encrypted variables
 ├── roles/                  # Local roles (per-stack apps)
 ├── collections/            # Vendored Ansible collections (jyok1m.*)
@@ -59,25 +59,7 @@ make install-collections   # Pinned Ansible collections
 make setup-hooks           # Pre-commit hooks (yamllint, ansible-lint, vault encrypt/decrypt)
 ```
 
-## Usage
-
-```bash
-make ping                  # Smoke-test connectivity to the OVH host
-make lint                  # Run yamllint + ansible-lint over the repo
-make dry-run               # Run the playbook in --check --diff mode
-make run                   # Run the playbook
-make run TAGS=traefik      # Run a single role
-```
-
-Vault helpers (idempotent — no-op when already in the target state):
-
-```bash
-make edit-vault
-make encrypt-vault
-make decrypt-vault
-```
-
-The pre-commit hook auto-encrypts `vault.yml` before each commit if it's staged. After committing vault changes, run `make decrypt-vault` to put the working tree back into editable plaintext.
+The pre-commit hook auto-encrypts `vault.yml` before each commit if it's staged. After committing vault changes, run `ansible-vault decrypt <vault>` to put the working tree back into editable plaintext.
 
 ## Testing the collections
 
@@ -100,8 +82,7 @@ molecule destroy    # cleanup when done
 ## Publishing collections
 
 ```bash
-make publish-collection            # jyok1m.docker_compose
-make publish-collection-hardening  # jyok1m.hardening
+./scripts/publishi-collection.sh hardening  # jyok1m.hardening
 ```
 
 Both pull `ANSIBLE_GALAXY_TOKEN` from `.env`. Bump `version:` in the collection's `galaxy.yml` before publishing.

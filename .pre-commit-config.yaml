@@ -17,10 +17,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: encrypt-vault
-        name: Encrypt vault before commit
-        entry: make encrypt-vault-and-stage
+      - id: forbid-plaintext-vault
+        name: Refuse plaintext vault files
+        entry: |
+          bash -c 'for f in "$@"; do head -1 "$f" | grep -q "^\$ANSIBLE_VAULT" || { echo "ERROR: $f is not encrypted"; exit 1; }; done' --
         language: system
-        files: ^group_vars/portfolio_group/vault\.yml$
-        pass_filenames: false
-        stages: [pre-commit]
+        files: ^(group_vars/infra/vault\.yml|host_vars/main-host/vault\.yml)$

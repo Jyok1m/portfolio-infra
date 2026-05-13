@@ -1,4 +1,10 @@
 ---
+- name: Création du répertoire data pour Traefik
+  ansible.builtin.file:
+    path: "{{ data_path }}"
+    state: directory
+    mode: "0750"
+
 - name: Création du ACME.json (si manquant) pour Traefik
   ansible.builtin.file:
     path: "{{ data_path }}/acme.json"

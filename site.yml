@@ -1,19 +1,34 @@
 ---
-- name: Provision portfolio-infra on the OVH host
-  hosts: ovh_host
+- name: Prepare hosts for ssh / firewall hardening and vRack configuration
+  hosts: all
   roles:
-    # Initial setup
-    - { role: hardening, tags: [setup, hardening] }
-    - { role: docker, tags: [setup, docker] }
+    - { role: hardening, tags: [hardening] }
+    - { role: vRack, tags: [vRack] }
+  tags: [setup]
 
-    # Common apps via Docker
-    - { role: traefik, tags: [common, traefik] }
-    - { role: jenkins, tags: [common, jenkins] }
-    - { role: monitoring, tags: [common, monitoring] }
+- name: Install engines and runtimes
+  hosts: all
+  roles:
+    - { role: docker, tags: [docker] }
+  tags: [engines]
 
-    # Client apps
-    - { role: portfolio, tags: [apps, portfolio] }
-    - { role: ipseis, tags: [apps, ipseis] }
+- name: Install common apps
+  hosts: all
+  roles:
+    - { role: traefik, tags: [traefik] }
+    - { role: jenkins, tags: [jenkins] }
+    - { role: monitoring, tags: [monitoring] }
+  tags: [common]
 
-    # DB Test
-    - { role: mongo_test, tags: [test, mongo_test] }
+- name: Install client apps
+  hosts: all
+  roles:
+    - { role: portfolio, tags: [portfolio] }
+    - { role: ipseis, tags: [ipseis] }
+  tags: [client]
+
+- name: Install private apps
+  hosts: all
+  roles:
+    - { role: mongo_test, tags: [mongo_test] }
+  tags: [private]

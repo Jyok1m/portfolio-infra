@@ -2,6 +2,9 @@
 app_name: monitoring
 app_path: /opt/{{ app_name }}
 
+monitoring_is_hub: "{{ 'infra' in group_names }}"
+monitoring_federation_port: 9090
+
 prometheus_image_name: prom/prometheus
 prometheus_image_tag: v3.7.3
 prometheus_image: "{{ prometheus_image_name }}:{{ prometheus_image_tag }}"
