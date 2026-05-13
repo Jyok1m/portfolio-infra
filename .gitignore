@@ -2,4 +2,5 @@
 .env
 .claude
 .venv
+.ansible
 collections/*/*.tar.gz
