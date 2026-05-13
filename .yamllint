@@ -7,7 +7,7 @@ yaml-files:
   - ".yamllint"
 
 ignore: |
-  group_vars/infra/vault.yml
+  group_vars/all/vault.yml
   host_vars/main-host/vault.yml
   **/*.tar.gz
   .cache/

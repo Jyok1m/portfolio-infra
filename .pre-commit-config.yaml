@@ -22,4 +22,4 @@ repos:
         entry: |
           bash -c 'for f in "$@"; do head -1 "$f" | grep -q "^\$ANSIBLE_VAULT" || { echo "ERROR: $f is not encrypted"; exit 1; }; done' --
         language: system
-        files: ^(group_vars/infra/vault\.yml|host_vars/main-host/vault\.yml)$
+        files: ^(group_vars/all/vault\.yml|host_vars/main-host/vault\.yml)$
