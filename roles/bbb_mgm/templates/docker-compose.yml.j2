@@ -16,6 +16,8 @@ services:
       BBB_SECRET: "{{ vault_bbb_secret }}"
       BBB_PLAYBACK_HOST: bbb.campus.lacapsule.academy
       DEFAULT_FULL_NAME: "La Capsule"
+      APP_PASSWORD: "{{ vault_bbb_mgm_app_password }}"
+      SESSION_SECRET: "{{ vault_bbb_mgm_session_secret }}"
     networks:
       - traefik-public
     labels:
