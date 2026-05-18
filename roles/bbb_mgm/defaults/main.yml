@@ -1,0 +1,7 @@
+---
+app_name: bbb-mgm
+app_path: /opt/{{ app_name }}
+
+bbb_mgm_image_name: registry.gitlab.com/capsule-devops/bbb-management-app
+bbb_mgm_image_tag: latest
+bbb_mgm_image: "{{ bbb_mgm_image_name }}:{{ bbb_mgm_image_tag }}"

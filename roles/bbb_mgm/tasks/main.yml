@@ -1,0 +1,11 @@
+---
+- name: Deploy {{ app_name }}
+  ansible.builtin.import_role:
+    name: jyok1m.docker_compose.deploy
+  vars:
+    docker_compose_app_name: "{{ app_name }}"
+    docker_compose_app_path: "{{ app_path }}"
+    docker_compose_templates:
+      - src: docker-compose.yml.j2
+        dest: docker-compose.yml
+        no_log: true

@@ -1,0 +1,31 @@
+services:
+  bbb-mgm:
+    image: {{ bbb_mgm_image }}
+    container_name: bbb-mgm
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: 1.0
+          memory: 512M
+        reservations:
+          memory: 128M
+    environment:
+      PORT: 8080
+      BBB_API_URL: https://bbb.campus.lacapsule.academy/bigbluebutton/api/
+      BBB_SECRET: "{{ vault_bbb_secret }}"
+      BBB_PLAYBACK_HOST: bbb.campus.lacapsule.academy
+      DEFAULT_FULL_NAME: "La Capsule"
+    networks:
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bbb-mgm.rule=Host(`{{ portfolio_domain_fr }}`)
+      - traefik.http.routers.bbb-mgm.entrypoints=websecure
+      - traefik.http.routers.bbb-mgm.tls.certresolver=letsencrypt
+      - traefik.http.services.bbb-mgm.loadbalancer.server.port=8080
+
+networks:
+  traefik-public:
+    name: traefik-public
+    external: true
