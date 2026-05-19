@@ -28,6 +28,8 @@ services:
       jenkins-internal:
         aliases:
           - docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   jenkins-gui:
     image: {{ jenkins_image }}
@@ -56,6 +58,8 @@ services:
     networks:
       - jenkins-internal
       - traefik-public
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     labels:
       - traefik.enable=true
       # Principal
