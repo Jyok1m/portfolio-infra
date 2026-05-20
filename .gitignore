@@ -4,3 +4,4 @@
 .venv
 .ansible
 collections/*/*.tar.gz
+.DS_Store
