@@ -10,6 +10,17 @@
         dest: docker-compose.yml
         no_log: true
 
+- name: Deploy {{ app_name_dev }}
+  ansible.builtin.import_role:
+    name: jyok1m.docker_compose.deploy
+  vars:
+    docker_compose_app_name: "{{ app_name_dev }}"
+    docker_compose_app_path: "{{ app_path }}"
+    docker_compose_templates:
+      - src: docker-compose.dev.yml.j2
+        dest: docker-compose.dev.yml
+        no_log: true
+
 - name: Schedule {{ app_name }}-db dumps
   ansible.builtin.import_role:
     name: jyok1m.backups.mongo_dump

@@ -1,0 +1,104 @@
+---
+services:
+  ipseis-db-dev:
+    image: {{ ipseis_db_image }}
+    container_name: ipseis-db-dev
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: 1.5
+        reservations:
+          memory: 512M
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --username
+        - "{{ vault_ipseis_db_root_user_dev }}"
+        - --password
+        - "{{ vault_ipseis_db_root_password_dev }}"
+        - --authenticationDatabase
+        - admin
+        - --eval
+        - "db.runCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: --wiredTigerCacheSizeGB 1
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME={{ vault_ipseis_db_root_user_dev }}
+      - MONGO_INITDB_ROOT_PASSWORD={{ vault_ipseis_db_root_password_dev }}
+    volumes:
+      - ipseis-db-dev:/data/db
+      - ipseis-db-configdb-dev:/data/configdb
+    ports:
+      - "127.0.0.1:{{ vault_ipseis_db_external_port_dev }}:27017/tcp"
+    networks:
+      - ipseis-internal-dev
+      - ipseis-db-host-dev
+
+  ipseis-api-dev:
+    image: {{ ipseis_image_dev }}
+    container_name: ipseis-api-dev
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: 1.0
+        reservations:
+          memory: 256M
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=768
+      - NODE_ENV=dev
+      - USER_AGENT_ENV=dev
+      - MONGODB_URI={{ vault_ipseis_db_uri_dev }}
+      - FRONTEND_URL=https://ipseis-git-dev-joachim-jasmins-projects.vercel.app/
+      - JWT_SECRET={{ vault_ipseis_jwt_secret }}
+      - NODEMAILER_EMAIL="ipseis.ne.pas.repondre@gmail.com"
+      - NODEMAILER_PASSWORD={{ vault_ipseis_nodemailer_password }}
+      - NODEMAILER_EMAIL_TO="joachim.jasmin-dev@proton.me"
+      - BACKEND_USERNAME={{ vault_ipseis_db_root_user_dev }}
+      - BACKEND_PASSWORD={{ vault_ipseis_db_root_password_dev }}
+    volumes:
+      - "{{ app_path }}/uploads-dev:/app/public/uploads"
+    networks:
+      - ipseis-internal-dev
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      # Principal
+      - traefik.http.routers.ipseis-api-dev.rule=Host(`ipseis-backend-dev.{{ portfolio_domain_fr }}`)
+      - traefik.http.routers.ipseis-ap-devi.entrypoints=websecure
+      - traefik.http.routers.ipseis-api-dev.tls.certresolver=letsencrypt
+      - traefik.http.services.ipseis-api-dev.loadbalancer.server.port=3000
+      # Redirect from .com to .fr
+      - traefik.http.routers.ipseis-api-dev-redirect.rule=Host(`ipseis-backend-dev.{{ portfolio_domain_com }}`)                                                                                                                             
+      - traefik.http.routers.ipseis-api-dev-redirect.entrypoints=websecure                                                                                                                                                             
+      - traefik.http.routers.ipseis-api-dev-redirect.tls.certresolver=letsencrypt                                                                                                                                                      
+      - traefik.http.routers.ipseis-api-dev-redirect.service=ipseis-api-dev                                                                                                                                                                
+      - traefik.http.routers.ipseis-api-dev-redirect.middlewares=ipseis-api-dev-redirect
+      # Middleware to perform the redirection
+      - traefik.http.middlewares.ipseis-api-dev-redirect.redirectregex.regex=^https?://ipseis-backend-dev\.{{ portfolio_domain_com | replace('.', '\\.') }}/(.*)                                                                            
+      - traefik.http.middlewares.ipseis-api-dev-redirect.redirectregex.replacement=https://ipseis-backend-dev.{{ portfolio_domain_fr }}/$${1}                                                                                             
+      - traefik.http.middlewares.ipseis-api-dev-redirect.redirectregex.permanent=true  
+
+volumes:
+  ipseis-db-dev:
+    name: ipseis-db-dev
+  ipseis-db-configdb-dev:
+    name: ipseis-db-configdb-dev
+
+networks:
+  ipseis-internal-dev:
+    name: ipseis-internal-dev
+    internal: true 
+  traefik-public:
+    name: traefik-public
+    external: true
+  ipseis-db-host-dev:
+    name: ipseis-db-host-dev

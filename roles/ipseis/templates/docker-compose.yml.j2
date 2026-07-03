@@ -39,6 +39,7 @@ services:
       - "127.0.0.1:{{ vault_ipseis_db_external_port }}:27017/tcp"
     networks:
       - ipseis-internal
+      - ipseis-db-host
 
   ipseis-api:
     image: {{ ipseis_image }}
@@ -99,3 +100,5 @@ networks:
   traefik-public:
     name: traefik-public
     external: true
+  ipseis-db-host:
+    name: ipseis-db-host
