@@ -28,27 +28,19 @@
     group: root
     mode: "0755"
 
-- name: "[gitlab_runner] Fetch GitLab Runner apt signing key"
-  ansible.builtin.get_url:
-    url: "{{ gitlab_runner_apt_gpg_url }}"
-    dest: "{{ gitlab_runner_apt_keyring }}"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
-- name: "[gitlab_runner] Add GitLab Runner apt repository"
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [signed-by={{ gitlab_runner_apt_keyring }}]
-      {{ gitlab_runner_apt_repo_url }}
-      {{ gitlab_runner_apt_distribution }} main
-    state: present
-    filename: gitlab-runner
-    update_cache: true
+- name: "[gitlab_runner] Add GitLab Runner apt repository (deb822)"
+  ansible.builtin.deb822_repository:
+    name: gitlab_runner
+    types: deb
+    uris: "{{ gitlab_runner_apt_repo_url }}"
+    suites: "{{ gitlab_runner_apt_distribution }}"
+    components: main
+    architectures: amd64
+    signed_by: "{{ gitlab_runner_apt_gpg_url }}"
 
 - name: "[gitlab_runner] Install gitlab-runner package"
   ansible.builtin.apt:
+    update_cache: true
     name: gitlab-runner
     state: present
 
